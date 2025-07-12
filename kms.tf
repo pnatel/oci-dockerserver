@@ -4,16 +4,16 @@ resource "oci_kms_vault" "oci-kms-vault" {
   vault_type     = "DEFAULT"
 }
 
-resource "oci_kms_key" "oci-kms-storage-key" {
-  compartment_id      = oci_identity_compartment.oci-compartment.id
-  display_name        = "${var.prefix}-storage-key-${random_string.oci-random.result}"
-  management_endpoint = oci_kms_vault.oci-kms-vault.management_endpoint
-  key_shape {
-    algorithm = "AES"
-    length    = 32
-  }
-  protection_mode = "SOFTWARE"
-}
+# resource "oci_kms_key" "oci-kms-storage-key" {
+#   compartment_id      = oci_identity_compartment.oci-compartment.id
+#   display_name        = "${var.prefix}-storage-key-${random_string.oci-random.result}"
+#   management_endpoint = oci_kms_vault.oci-kms-vault.management_endpoint
+#   key_shape {
+#     algorithm = "AES"
+#     length    = 32
+#   }
+#   protection_mode = "SOFTWARE"
+# }
 
 /* resource "oci_kms_vault" "oci-kms-disk-vault" {
   compartment_id = oci_identity_compartment.oci-compartment.id
