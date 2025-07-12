@@ -46,6 +46,7 @@ resource "oci_core_instance" "oci-instance" {
         tenancy_ocid           = var.tenancy_ocid
         web_port               = var.web_port
         project_directory      = var.project_directory
+        project_url           = var.project_url
       }
     ))
   }

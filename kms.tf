@@ -210,13 +210,13 @@ resource "oci_kms_key" "oci-kms-disk-key" {
 #   compartment_id      = oci_identity_compartment.oci-compartment.id
 # }
 
-# resource "hcp_vault_secrets_app" "cloudoffice-oci" {
-#   app_name    = "${var.prefix}-cloudoffice-oci"
+# resource "hcp_vault_secrets_app" "dockerhost-oci" {
+#   app_name    = "${var.prefix}-dockerhost-oci"
 #   description = "Store App variables accross deployments/upgrades"
 # }
 
 # resource "hcp_vault_secrets_secret" "boot_volume" {
-#   app_name     = hcp_vault_secrets_app.cloudoffice-oci.app_name
+#   app_name     = hcp_vault_secrets_app.dockerhost-oci.app_name
 #   secret_name  = "boot_volume"
 #   secret_value = length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) > 0 ? (element(data.oci_core_boot_volumes.boot_volumes.boot_volumes, length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) - 1).state == "AVAILABLE" ? element(data.oci_core_boot_volumes.boot_volumes.boot_volumes, length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) - 1).id : data.oci_core_image.oci-image.id) : data.oci_core_image.oci-image.id
 # }

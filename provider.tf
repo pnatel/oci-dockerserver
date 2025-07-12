@@ -8,7 +8,7 @@ terraform {
     workspaces {
       name = "oci-dockerserver"
       # use with "terraform workspace" command to set the woekspace 
-      # prefix = "cloudoffice-oci-"
+      # prefix = "dockerhost-oci-"
     }
   }
   # -------end-------

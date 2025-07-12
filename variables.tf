@@ -110,7 +110,7 @@ variable "oo_password" {
 variable "project_url" {
   type        = string
   description = "URL of the git project"
-  default = "value"
+  default = "https://github.com/pnatel/oci-dockerserver.git"
 }
 
 # # -------Gsilva custom bits----------
