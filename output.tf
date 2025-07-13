@@ -1,9 +1,10 @@
 output "SSH" {
   value = "ssh -i ~/scripts/SSH/oci_vm ubuntu@${oci_core_instance.oci-instance.public_ip}"
 }
-# output "Monitor_installation_progress" {
-#   value = "tail -F /var/log/dockerhost.log"
-# }
+output "Monitor_installation_progress" {
+  value = "tail -F /var/log/dockerhost.log"
+}
+
 # output "WebUI" {
 #   value = "${var.enable_dns != 0 && var.web_port == "443" ? "https://${var.dns_domain}/nc/" : ""}${var.enable_dns != 0 && var.web_port != "443" ? "https://${var.dns_domain}:${var.web_port}/nc/" : ""}${var.enable_dns == 0 && var.web_port == "443" ? "https://${oci_core_instance.oci-instance.public_ip}/" : ""}${var.enable_dns == 0 && var.web_port != "443" ? "https://${oci_core_instance.oci-instance.public_ip}:${var.web_port}/" : ""}"
 # }

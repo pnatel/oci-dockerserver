@@ -1,33 +1,35 @@
 #!/bin/bash
-// # Create systemd service unit file
-// tee /etc/systemd/system/dockerhost-ansible-state.service << EOM
-// [Unit]
-// Description=dockerhost-ansible-state
-// After=network.target
+# Create systemd service unit file
+tee /etc/systemd/system/dockerhost-ansible-state.service << EOM
+[Unit]
+Description=dockerhost-ansible-state
+After=network.target
 
-// [Service]
-// ExecStart=${project_directory}/dockerhost-ansible-state.sh
-// Type=simple
-// Restart=on-failure
-// RestartSec=30
+[Service]
+ExecStart=${project_directory}/dockerhost-ansible-state.sh
+Type=simple
+Restart=on-failure
+RestartSec=30
 
-// [Install]
-// WantedBy=multi-user.target
-// EOM
+[Install]
+WantedBy=multi-user.target
+EOM
 
-// # Create systemd timer unit file
-// tee /etc/systemd/system/dockerhost-ansible-state.timer << EOM
-// [Unit]
-// Description=Starts dockerhost ansible state playbook 1min after boot
+# Create systemd timer unit file
+tee /etc/systemd/system/dockerhost-ansible-state.timer << EOM
+[Unit]
+Description=Starts dockerhost ansible state playbook 1min after boot
 
-// [Timer]
-// OnBootSec=1min
-// Unit=dockerhost-ansible-state.service
+[Timer]
+OnBootSec=1min
+Unit=dockerhost-ansible-state.service
 
-// [Install]
-// WantedBy=multi-user.target
-// EOM
+[Install]
+WantedBy=multi-user.target
+EOM
 
+# Create project directory
+mkdir -p ${project_directory}
 # Create dockerhost vars file to be used with Ansible-playbook
 tee ${project_directory}/dockerhost-vars.yaml << EOM
 oci_region: ${oci_region} 
@@ -55,21 +57,21 @@ ansible-galaxy collection install oracle.oci amazon.aws
 sudo usermod -aG docker ubuntu
 
 # Make the project directory
-mkdir -p ${project_directory}/git/dockerhost 
+mkdir -p ${project_directory}/git/oci-dockerhost 
 # Clone the project into project directory
-git clone -b ansible ${project_url} ${project_directory}/git/dockerhost
+git clone ${project_url} ${project_directory}/git/oci-dockerhost
 # Change to directory
-cd ${project_directory}/git/dockerhost
+cd ${project_directory}/git/oci-dockerhost
 # Ensure up-to-date
 git pull
 # Execute playbook
 ansible-playbook dockerhost_playbook.yml --extra-vars '@${project_directory}/dockerhost-vars.yaml' >> /var/log/dockerhost.log
 EOM
 
-// # Start / Enable dockerhost-ansible-state
-// chmod +x ${project_directory}/dockerhost-ansible-state.sh
-// systemctl daemon-reload
-// systemctl start dockerhost-ansible-state.timer
-// systemctl start dockerhost-ansible-state.service
-// systemctl enable dockerhost-ansible-state.timer
-// systemctl enable dockerhost-ansible-state.service
+# Start / Enable dockerhost-ansible-state
+chmod +x ${project_directory}/dockerhost-ansible-state.sh
+systemctl daemon-reload
+systemctl start dockerhost-ansible-state.timer
+systemctl start dockerhost-ansible-state.service
+systemctl enable dockerhost-ansible-state.timer
+systemctl enable dockerhost-ansible-state.service

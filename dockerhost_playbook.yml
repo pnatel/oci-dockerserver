@@ -1,0 +1,125 @@
+- name: Dockerhost on oracle (oci)
+  hosts: localhost
+  connection: local
+  collections:
+    - oracle.oci
+  gather_facts: true
+  become: true
+  become_user: root
+  tasks:
+
+    - name: Capture start time
+      set_fact:
+        start_time: "{{ ansible_date_time.iso8601 }}"
+
+    - name: Display start time
+      debug:
+        msg: "Playbook started at {{ start_time }}"
+
+    - name: Check swap file exists
+      ansible.builtin.stat:
+        path: "/{{ project_directory }}/swap.file"
+      register: swap_file
+
+    - name: Create swap file if not exists
+      ansible.builtin.shell: |
+        dd if=/dev/zero of=/"{{ project_directory }}"/swap.file bs=1024 count=1048576
+        mkswap /"{{ project_directory }}"/swap.file
+      when:
+        - not swap_file.stat.exists
+        - ansible_swaptotal_mb < 1
+
+    - name: Set swap file permissions
+      ansible.builtin.file:
+        path: "/{{ project_directory }}/swap.file"
+        state: file
+        owner: root
+        group: root
+        mode: '0600'
+      when:
+        - ansible_swaptotal_mb < 1
+
+    - name: Set swap mount
+      ansible.builtin.mount:
+        src: /"{{ project_directory }}"/swap.file
+        path: none
+        fstype: swap
+        opts: sw
+        passno: '0'
+        dump: '0'
+        state: present
+      when:
+        - ansible_swaptotal_mb < 1
+
+    - name: Mount swap now
+      ansible.builtin.shell: |
+        swapon /"{{ project_directory }}"/swap.file
+      when:
+        - ansible_swaptotal_mb < 1
+
+    - name: Required packages
+      ansible.builtin.apt:
+        pkg:
+          - docker.io
+          # - libcap2-bin
+          - python3-pip
+          # - ssl-cert
+          - docker-compose
+        state: latest
+        update_cache: true
+
+    - name: Docker python packages
+      ansible.builtin.pip:
+        name:
+          - docker
+        executable: pip3
+        break_system_packages: true
+        state: latest
+
+
+    - name: IP Forwarding enable/persist
+      ansible.builtin.sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        state: present
+        reload: true
+        sysctl_set: true
+        sysctl_file: /etc/sysctl.conf
+
+    - name: Docker service started/enabled
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Get oci metadata
+      ansible.builtin.uri:
+        url: http://169.254.169.254/opc/v2/vnics/
+        headers:
+          Authorization: "Bearer Oracle"
+      register: oci_vnic_metadata
+
+    - name: Get oci private ip facts
+      oracle.oci.oci_network_private_ip_facts:
+        auth_type: "instance_principal"
+        vnic_id: "{{ oci_vnic_metadata.json[0].vnicId }}"
+        tenancy: "{{ tenancy_ocid }}"
+      register: private_ip_data
+
+    - name: Get oci public ip facts
+      oracle.oci.oci_network_public_ip_facts:
+        auth_type: "instance_principal"
+        private_ip_id: "{{ private_ip_data.private_ips[0].id }}"
+      register: public_ip_data
+
+    - name: Set public ip fact for webproxy
+      ansible.builtin.set_fact:
+        instance_public_ip: "{{ public_ip_data.public_ips[0].ip_address }}"
+
+    - name: Capture end time
+      set_fact:
+        end_time: "{{ ansible_date_time.iso8601 }}"
+
+    - name: Display end time
+      debug:
+        msg: "Playbook ended at {{ end_time }}"

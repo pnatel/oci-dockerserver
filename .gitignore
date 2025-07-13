@@ -1,2 +1,11 @@
+# Local .terraform.lock.hcl files
+.terraform.lock.hcl
+
 # Local .terraform directories
-.terraform/*    
+.terraform/*
+
+# Local Ansible directories
+.ansible/*
+
+# Local VSCode directories
+.vscode/*
