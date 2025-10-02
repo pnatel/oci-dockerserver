@@ -46,11 +46,11 @@ timedatectl set-timezone Australia/Brisbane
 # Update package list
 apt-get update
 # Install pip3 and git
-DEBIAN_FRONTEND=noninteractive apt-get -y install python3-pip git
+DEBIAN_FRONTEND=noninteractive apt-get -y install git
 # Pip update pip
 pip3 install --upgrade --break-system-packages pip
 # Install ansible and oci libraries
-pip3 install --upgrade --break-system-packages ansible cryptography pyOpenssl "oci==2.87.0" botocore boto3
+pip3 install --upgrade --break-system-packages ansible pyOpenssl "oci==2.87.0" botocore boto3
 # And the collection
 ansible-galaxy collection install oracle.oci amazon.aws
 # add docker group to ubuntu user

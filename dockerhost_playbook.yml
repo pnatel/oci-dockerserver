@@ -158,11 +158,84 @@
       when: not scripts_repo_state.stat.exists
       # ignore_errors: true
 
-    # Docker compose builds
-    - name: Start services using Docker Compose (Basic Services)
-      community.docker.docker_compose_v2:
-        project_src: "{{ project_directory }}/git/scripts/docker/cloud/basicservices/docker-compose.yaml"
-        state: present  # Options: present, absent, restarted
+
+    # Configure a VPN client
+    - name: Zerotier container VPN
+      community.docker.docker_container:
+        name: zerotier_vpn
+        hostname: zerotiervpn
+        image: zerotier/zerotier:latest
+        devices:
+          - /dev/net/tun
+        network_mode: host
+        capabilities:
+          - NET_ADMIN
+          - SYS_ADMIN
+          - CAP_SYS_RAWIO
+        volumes:
+          - "/{{ project_directory }}/zerotier-one:/var/lib/zerotier-one"
+        pull: true
+        # purge_networks: true
+        restart_policy: "always"
+        container_default_behavior: "compatibility"
+      no_log: false
+      ignore_errors: true
+      tags:
+        - basicservices
+
+    - name: Portainer agent container (Docker Management)
+      community.docker.docker_container:
+        name: portainer_agent
+        hostname: portaineragent
+        image: portainer/agent:latest
+        ports:
+          - 9001:9001
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - /var/lib/docker/volumes:/var/lib/docker/volumes
+          - /:/host
+        pull: true
+        restart_policy: "always"
+        container_default_behavior: "compatibility"
+      no_log: true
+      tags:
+        - basicservices
+
+    - name: watchtower container (automatic updates)
+      community.docker.docker_container:
+        name: watchtower
+        hostname: watchtower
+        image: containrrr/watchtower
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+        env:
+          WATCHTOWER_CLEANUP: "true"
+          TZ: Australia/Brisbane
+          # WATCHTOWER_POLL_INTERVAL: 21600  # 6 hours
+          # https://pkg.go.dev/github.com/robfig/cron@v1.2.0#hdr-CRON_Expression_Format
+          WATCHTOWER_SCHEDULE: "0 0 22 * * 5"
+          # WATCHTOWER_NOTIFICATION_REPORT: "true"
+          # WATCHTOWER_NOTIFICATION_URL: >
+        pull: true
+        restart_policy: "unless-stopped"
+        container_default_behavior: "compatibility"
+      no_log: true
+      tags:
+        - basicservices
+
+    - name: Join Zerotier Network
+      ansible.builtin.shell:
+        cmd: "docker exec zerotier_vpn zerotier-cli join {{ zerotier_ntwk_decrypt.decrypted_data.plaintext | b64decode  }}"
+      args:
+        executable: /bin/bash
+      tags:
+        - basicservices
+
+    # # Docker compose builds
+    # - name: Start services using Docker Compose (Basic Services)
+    #   community.docker.docker_compose_v2:
+    #     project_src: "{{ project_directory }}/git/scripts/docker/cloud/basicservices/docker-compose.yaml"
+    #     state: present  # Options: present, absent, restarted
 
 
     - name: Capture end time
