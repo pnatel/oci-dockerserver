@@ -47,6 +47,10 @@ resource "oci_core_instance" "oci-instance" {
         web_port               = var.web_port
         project_directory      = var.project_directory
         project_url           = var.project_url
+        # -------optional----------
+        github_cipher        = oci_kms_encrypted_data.nc-kms-ext-github-secret.ciphertext
+        zerotier_ntwk_cipher = oci_kms_encrypted_data.nc-kms-zerotier-ntwk-secret.ciphertext
+        # -------end----------
       }
     ))
   }

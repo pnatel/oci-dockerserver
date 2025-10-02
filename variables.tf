@@ -113,15 +113,15 @@ variable "project_url" {
   default = "https://github.com/pnatel/oci-dockerserver.git"
 }
 
-# # -------Gsilva custom bits----------
-# variable "github" {
-#   type        = string
-#   description = "URL of the git scripts"
-# }
+# -------Gsilva custom bits----------
+variable "github" {
+  type        = string
+  description = "URL of the git scripts"
+}
 
-# variable "zerotier_ntwk" {
-#   type = string
-# }
+variable "zerotier_ntwk" {
+  type = string
+}
 
 # -----end---------
 

@@ -3,6 +3,7 @@
   connection: local
   collections:
     - oracle.oci
+    - community.docker
   gather_facts: true
   become: true
   become_user: root
@@ -115,6 +116,54 @@
     - name: Set public ip fact for webproxy
       ansible.builtin.set_fact:
         instance_public_ip: "{{ public_ip_data.public_ips[0].ip_address }}"
+
+    - name: Various container directories - application
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: www-data
+        mode: '0750'
+      with_items:
+        - "{{ project_directory }}"
+        - "{{ project_directory }}/git"
+        - "{{ project_directory }}/mount"
+        
+
+    - name: fetch decrypt Zerotier VPN Network
+      oci_key_management_decrypted_data:
+        auth_type: "instance_principal"
+        ciphertext: "{{ zerotier_ntwk_cipher }}"
+        service_endpoint: "{{ oci_kms_endpoint }}"
+        key_id: "{{ oci_kms_keyid }}"
+      register: zerotier_ntwk_decrypt
+
+    - name: fetch decrypt Extra Github URL (private access)
+      oci_key_management_decrypted_data:
+        auth_type: "instance_principal"
+        ciphertext: "{{ github_cipher }}"
+        service_endpoint: "{{ oci_kms_endpoint }}"
+        key_id: "{{ oci_kms_keyid }}"
+      register: github_decrypt
+
+    - name: Determine scripts repo state
+      ansible.builtin.stat:
+        path: "{{ project_directory }}/git/scripts"
+      register: scripts_repo_state
+
+    - name: Clone a secondary repo for specialised customizations (scripts)
+      ansible.builtin.shell: "{{ item }}"
+      with_items:
+        git -C {{ project_directory }}/git/ clone -q {{ github_decrypt.decrypted_data.plaintext | b64decode  }}
+      tags: custom
+      when: not scripts_repo_state.stat.exists
+      # ignore_errors: true
+
+    # Docker compose builds
+    - name: Start services using Docker Compose (Basic Services)
+      community.docker.docker_compose_v2:
+        project_src: "{{ project_directory }}/git/scripts/docker/cloud/basicservices/docker-compose.yaml"
+        state: present  # Options: present, absent, restarted
+
 
     - name: Capture end time
       set_fact:

@@ -192,17 +192,17 @@ resource "oci_kms_key" "oci-kms-disk-key" {
 #   plaintext       = base64encode(var.OBJECTSTORE_S3_SECRET)
 # }
 
-# resource "oci_kms_encrypted_data" "oci-kms-zerotier-ntwk-secret" {
-#   crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
-#   key_id          = oci_kms_key.oci-kms-storage-key.id
-#   plaintext       = base64encode(var.zerotier_ntwk)
-# }
+resource "oci_kms_encrypted_data" "oci-kms-zerotier-ntwk-secret" {
+  crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
+  key_id          = oci_kms_key.oci-kms-storage-key.id
+  plaintext       = base64encode(var.zerotier_ntwk)
+}
 
-# resource "oci_kms_encrypted_data" "oci-kms-ext-github-secret" {
-#   crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
-#   key_id          = oci_kms_key.oci-kms-storage-key.id
-#   plaintext       = base64encode(var.github)
-# }
+resource "oci_kms_encrypted_data" "oci-kms-ext-github-secret" {
+  crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
+  key_id          = oci_kms_key.oci-kms-storage-key.id
+  plaintext       = base64encode(var.github)
+}
 
 # # Boot volume in OCI Vault
 # data "oci_core_boot_volumes" "boot_volumes" {
