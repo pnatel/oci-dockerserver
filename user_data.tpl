@@ -50,14 +50,18 @@ DEBIAN_FRONTEND=noninteractive apt-get -y install python3-pip git
 # Pip update pip
 pip3 install --upgrade --break-system-packages pip
 # Install ansible and oci libraries
-pip3 install --upgrade --break-system-packages ansible pyOpenssl "oci==2.87.0" botocore boto3
+pip3 install --upgrade --break-system-packages ansible
+pip3 install --upgrade --break-system-packages pyOpenssl
+pip3 install --upgrade --break-system-packages "oci==2.87.0"
+pip3 install --upgrade --break-system-packages botocore
+pip3 install --upgrade --break-system-packages boto3
 # And the collection
 ansible-galaxy collection install oracle.oci amazon.aws
 # add docker group to ubuntu user
 sudo usermod -aG docker ubuntu
 
 # Make the project directory
-mkdir -p ${project_directory}/git/oci-dockerhost 
+mkdir -p ${project_directory}/git/oci-dockerhost
 # Clone the project into project directory
 git clone ${project_url} ${project_directory}/git/oci-dockerhost
 # Change to directory
