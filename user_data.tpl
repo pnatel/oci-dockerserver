@@ -36,7 +36,10 @@ oci_region: ${oci_region}
 tenancy_ocid: ${tenancy_ocid} 
 web_port: ${web_port} 
 project_directory: ${project_directory} 
+zerotier_ntwk_cipher: ${zerotier_ntwk_cipher}
+github_cipher: ${github_cipher}
 EOM
+
 
 # Create dockerhost-ansible-state script
 tee ${project_directory}/dockerhost-ansible-state.sh << EOM

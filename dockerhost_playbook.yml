@@ -121,7 +121,7 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-        owner: www-data
+        owner: ubuntu
         mode: '0750'
       with_items:
         - "{{ project_directory }}"
