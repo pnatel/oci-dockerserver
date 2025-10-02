@@ -93,29 +93,29 @@
         state: started
         enabled: true
 
-    - name: Get oci metadata
-      ansible.builtin.uri:
-        url: http://169.254.169.254/opc/v2/vnics/
-        headers:
-          Authorization: "Bearer Oracle"
-      register: oci_vnic_metadata
+    # - name: Get oci metadata
+    #   ansible.builtin.uri:
+    #     url: http://169.254.169.254/opc/v2/vnics/
+    #     headers:
+    #       Authorization: "Bearer Oracle"
+    #   register: oci_vnic_metadata
 
-    - name: Get oci private ip facts
-      oracle.oci.oci_network_private_ip_facts:
-        auth_type: "instance_principal"
-        vnic_id: "{{ oci_vnic_metadata.json[0].vnicId }}"
-        tenancy: "{{ tenancy_ocid }}"
-      register: private_ip_data
+    # - name: Get oci private ip facts
+    #   oracle.oci.oci_network_private_ip_facts:
+    #     auth_type: "instance_principal"
+    #     vnic_id: "{{ oci_vnic_metadata.json[0].vnicId }}"
+    #     tenancy: "{{ tenancy_ocid }}"
+    #   register: private_ip_data
 
-    - name: Get oci public ip facts
-      oracle.oci.oci_network_public_ip_facts:
-        auth_type: "instance_principal"
-        private_ip_id: "{{ private_ip_data.private_ips[0].id }}"
-      register: public_ip_data
+    # - name: Get oci public ip facts
+    #   oracle.oci.oci_network_public_ip_facts:
+    #     auth_type: "instance_principal"
+    #     private_ip_id: "{{ private_ip_data.private_ips[0].id }}"
+    #   register: public_ip_data
 
-    - name: Set public ip fact for webproxy
-      ansible.builtin.set_fact:
-        instance_public_ip: "{{ public_ip_data.public_ips[0].ip_address }}"
+    # - name: Set public ip fact for webproxy
+    #   ansible.builtin.set_fact:
+    #     instance_public_ip: "{{ public_ip_data.public_ips[0].ip_address }}"
 
     - name: Various container directories - application
       ansible.builtin.file:
