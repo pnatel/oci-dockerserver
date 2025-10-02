@@ -46,7 +46,7 @@ timedatectl set-timezone Australia/Brisbane
 # Update package list
 apt-get update
 # Install pip3 and git
-DEBIAN_FRONTEND=noninteractive apt-get -y install git
+DEBIAN_FRONTEND=noninteractive apt-get -y install python3-pip git
 # Pip update pip
 pip3 install --upgrade --break-system-packages pip
 # Install ansible and oci libraries
