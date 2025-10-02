@@ -25,16 +25,16 @@ variable "region" {
 # Alternatively:
 # Run the following command to retrieve the latest Ubuntu 22.04 LTS image
 #    OCI_TENANCY_OCID=$(oci iam compartment list --all --compartment-id-in-subtree true --access-level ACCESSIBLE --include-root --raw-output --query "data[?contains(\"id\",'tenancy')].id | [0]") && oci compute image list --compartment-id $OCI_TENANCY_OCID --all --lifecycle-state 'AVAILABLE' --operating-system "Canonical Ubuntu" --operating-system-version "24.04" --sort-by "TIMECREATED" | grep 'display-name\|ocid'
-    # "display-name": "Canonical-Ubuntu-24.04-aarch64-2025.05.20-0",
-    # "id": "ocid1.image.oc1.us-sanjose-1.aaaaaaaa43mwu75532lsj655xqgl4flkmlzbpin54ccoddrkpoyygzh4pvmq",
-    # "display-name": "Canonical-Ubuntu-24.04-aarch64-2025.05.20-0",
-    # "id": "ocid1.image.oc1.ap-sydney-1.aaaaaaaarcbc3y6yx6nmsu5rfipwz362oiex4xv2ullte7leheohvxam5kpa",
-    # "display-name": "Canonical-Ubuntu-24.04-aarch64-2025.05.20-0",
-    # "id": "ocid1.image.oc1.sa-saopaulo-1.aaaaaaaawov7fxz5kmg3wzxmdc64cee7cdpgeo76yef3qdyttu4xnzbzhprq",
+# "display-name": "Canonical-Ubuntu-24.04-aarch64-2025.05.20-0",
+# "id": "ocid1.image.oc1.us-sanjose-1.aaaaaaaa43mwu75532lsj655xqgl4flkmlzbpin54ccoddrkpoyygzh4pvmq",
+# "display-name": "Canonical-Ubuntu-24.04-aarch64-2025.05.20-0",
+# "id": "ocid1.image.oc1.ap-sydney-1.aaaaaaaarcbc3y6yx6nmsu5rfipwz362oiex4xv2ullte7leheohvxam5kpa",
+# "display-name": "Canonical-Ubuntu-24.04-aarch64-2025.05.20-0",
+# "id": "ocid1.image.oc1.sa-saopaulo-1.aaaaaaaawov7fxz5kmg3wzxmdc64cee7cdpgeo76yef3qdyttu4xnzbzhprq",
 variable "oci_imageid" {
   type        = string
   description = "An OCID of an image, the playbook is compatible with Ubuntu 18.04+ minimal"
-  default = "ocid1.image.oc1.sa-saopaulo-1.aaaaaaaawov7fxz5kmg3wzxmdc64cee7cdpgeo76yef3qdyttu4xnzbzhprq"
+  default     = "ocid1.image.oc1.sa-saopaulo-1.aaaaaaaawov7fxz5kmg3wzxmdc64cee7cdpgeo76yef3qdyttu4xnzbzhprq"
 }
 
 variable "oci_adnumber" {
@@ -89,7 +89,7 @@ variable "mgmt_cidr" {
 variable "prefix" {
   type        = string
   description = "A friendly prefix (like 'pihole') affixed to many resources, like the bucket name."
-  default = "dckrsvr"
+  default     = "dckrsvr"
 }
 /* 
 variable "admin_password" {
@@ -110,7 +110,7 @@ variable "oo_password" {
 variable "project_url" {
   type        = string
   description = "URL of the git project"
-  default = "https://github.com/pnatel/oci-dockerserver.git"
+  default     = "https://github.com/pnatel/oci-dockerserver.git"
 }
 
 # -------Gsilva custom bits----------

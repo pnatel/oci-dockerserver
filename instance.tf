@@ -29,11 +29,11 @@ resource "oci_core_instance" "oci-instance" {
     ocpus         = var.oci_instance_ocpus
   }
   source_details {
-    source_id               = data.oci_core_image.oci-image.id
-    source_type             = "image"
+    source_id   = data.oci_core_image.oci-image.id
+    source_type = "image"
     # source_id   = var.preserve_boot_volume == false ? data.oci_core_image.oci-image.id : base64decode(oci_vault_secret.boot_volume.secret_content.0.content)
     # source_type = var.preserve_boot_volume == true ? (startswith(base64decode(oci_vault_secret.boot_volume.secret_content.0.content), "ocid1.bootvolume") ? "bootVolume" : "image") : "image"
-    kms_key_id  = oci_kms_key.oci-kms-disk-key.id
+    kms_key_id = oci_kms_key.oci-kms-disk-key.id
     # Applicable when source_type=image
     boot_volume_size_in_gbs = var.oci_instance_diskgb
   }
@@ -42,14 +42,14 @@ resource "oci_core_instance" "oci-instance" {
     user_data = base64encode(templatefile(
       "user_data.tpl",
       {
-        oci_region             = local.oci_region
-        tenancy_ocid           = var.tenancy_ocid
-        web_port               = var.web_port
-        project_directory      = var.project_directory
-        project_url           = var.project_url
+        oci_region        = local.oci_region
+        tenancy_ocid      = var.tenancy_ocid
+        web_port          = var.web_port
+        project_directory = var.project_directory
+        project_url       = var.project_url
         # -------optional----------
-        github_cipher        = oci_kms_encrypted_data.nc-kms-ext-github-secret.ciphertext
-        zerotier_ntwk_cipher = oci_kms_encrypted_data.nc-kms-zerotier-ntwk-secret.ciphertext
+        github_cipher        = oci_kms_encrypted_data.kms-ext-github-secret.ciphertext
+        zerotier_ntwk_cipher = oci_kms_encrypted_data.kms-zerotier-ntwk-secret.ciphertext
         # -------end----------
       }
     ))

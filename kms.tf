@@ -4,16 +4,16 @@ resource "oci_kms_vault" "oci-kms-vault" {
   vault_type     = "DEFAULT"
 }
 
-# resource "oci_kms_key" "oci-kms-storage-key" {
-#   compartment_id      = oci_identity_compartment.oci-compartment.id
-#   display_name        = "${var.prefix}-storage-key-${random_string.oci-random.result}"
-#   management_endpoint = oci_kms_vault.oci-kms-vault.management_endpoint
-#   key_shape {
-#     algorithm = "AES"
-#     length    = 32
-#   }
-#   protection_mode = "SOFTWARE"
-# }
+resource "oci_kms_key" "oci-kms-storage-key" {
+  compartment_id      = oci_identity_compartment.oci-compartment.id
+  display_name        = "${var.prefix}-storage-key-${random_string.oci-random.result}"
+  management_endpoint = oci_kms_vault.oci-kms-vault.management_endpoint
+  key_shape {
+    algorithm = "AES"
+    length    = 32
+  }
+  protection_mode = "SOFTWARE"
+}
 
 /* resource "oci_kms_vault" "oci-kms-disk-vault" {
   compartment_id = oci_identity_compartment.oci-compartment.id
@@ -192,13 +192,13 @@ resource "oci_kms_key" "oci-kms-disk-key" {
 #   plaintext       = base64encode(var.OBJECTSTORE_S3_SECRET)
 # }
 
-resource "oci_kms_encrypted_data" "oci-kms-zerotier-ntwk-secret" {
+resource "oci_kms_encrypted_data" "kms-zerotier-ntwk-secret" {
   crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
   key_id          = oci_kms_key.oci-kms-storage-key.id
   plaintext       = base64encode(var.zerotier_ntwk)
 }
 
-resource "oci_kms_encrypted_data" "oci-kms-ext-github-secret" {
+resource "oci_kms_encrypted_data" "kms-ext-github-secret" {
   crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
   key_id          = oci_kms_key.oci-kms-storage-key.id
   plaintext       = base64encode(var.github)
