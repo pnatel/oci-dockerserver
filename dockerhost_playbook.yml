@@ -73,6 +73,7 @@
       ansible.builtin.pip:
         name:
           - docker
+          - oci
         executable: pip3
         break_system_packages: true
         state: latest
@@ -177,7 +178,8 @@
           - /dev/net/tun
         network_mode: host
         env:
-          - ZEROTIER_API_SECRET: "{{ zerotier_token_decrypt.decrypted_data.plaintext | b64decode  }}"
+          ZEROTIER_API_SECRET: "{{ zerotier_token_decrypt.decrypted_data.plaintext | b64decode  }}"
+        command: {{ zerotier_ntwk_decrypt.decrypted_data.plaintext | b64decode  }}
         capabilities:
           - NET_ADMIN
           - SYS_ADMIN
@@ -236,13 +238,13 @@
       tags:
         - basicservices
 
-    - name: Join Zerotier Network
-      ansible.builtin.shell:
-        cmd: "docker exec zerotier_vpn zerotier-cli join {{ zerotier_ntwk_decrypt.decrypted_data.plaintext | b64decode  }}"
-      args:
-        executable: /bin/bash
-      tags:
-        - basicservices
+    # - name: Join Zerotier Network
+    #   ansible.builtin.shell:
+    #     cmd: "docker exec zerotier_vpn zerotier-cli join {{ zerotier_ntwk_decrypt.decrypted_data.plaintext | b64decode  }}"
+    #   args:
+    #     executable: /bin/bash
+    #   tags:
+    #     - basicservices
 
     # # Docker compose builds
     # - name: Start services using Docker Compose (Basic Services)
