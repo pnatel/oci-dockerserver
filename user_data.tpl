@@ -36,6 +36,8 @@ oci_region: ${oci_region}
 tenancy_ocid: ${tenancy_ocid} 
 web_port: ${web_port} 
 project_directory: ${project_directory} 
+oci_kms_endpoint: ${oci_kms_endpoint} 
+oci_kms_keyid: ${oci_kms_keyid} 
 zerotier_ntwk_cipher: ${zerotier_ntwk_cipher}
 github_cipher: ${github_cipher}
 EOM
