@@ -47,8 +47,8 @@ resource "oci_core_instance" "oci-instance" {
         web_port          = var.web_port
         project_directory = var.project_directory
         project_url       = var.project_url
-        oci_kms_endpoint       = oci_kms_vault.nc-kms-vault.crypto_endpoint
-        oci_kms_keyid          = oci_kms_key.nc-kms-storage-key.id
+        oci_kms_endpoint  = oci_kms_vault.oci-kms-vault.crypto_endpoint
+        oci_kms_keyid     = oci_kms_key.oci-kms-storage-key.id
         # -------optional----------
         github_cipher        = oci_kms_encrypted_data.kms-ext-github-secret.ciphertext
         zerotier_ntwk_cipher = oci_kms_encrypted_data.kms-zerotier-ntwk-secret.ciphertext
