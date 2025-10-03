@@ -137,6 +137,14 @@
         key_id: "{{ oci_kms_keyid }}"
       register: zerotier_ntwk_decrypt
 
+    - name: fetch decrypt Zerotier VPN Token
+      oci_key_management_decrypted_data:
+        auth_type: "instance_principal"
+        ciphertext: "{{ zerotier_token_cipher }}"
+        service_endpoint: "{{ oci_kms_endpoint }}"
+        key_id: "{{ oci_kms_keyid }}"
+      register: zerotier_token_decrypt
+
     - name: fetch decrypt Extra Github URL (private access)
       oci_key_management_decrypted_data:
         auth_type: "instance_principal"
@@ -168,12 +176,14 @@
         devices:
           - /dev/net/tun
         network_mode: host
+        env:
+          - ZEROTIER_API_SECRET: "{{ zerotier_token_decrypt.decrypted_data.plaintext | b64decode  }}"
         capabilities:
           - NET_ADMIN
           - SYS_ADMIN
           - CAP_SYS_RAWIO
         volumes:
-          - "/{{ project_directory }}/zerotier-one:/var/lib/zerotier-one"
+          - "/{{ project_directory }}/mount/zerotier-one:/var/lib/zerotier-one"
         pull: true
         # purge_networks: true
         restart_policy: "always"
@@ -183,17 +193,20 @@
       tags:
         - basicservices
 
-    - name: Portainer agent container (Docker Management)
+    - name: Portainer container (Docker Management)
       community.docker.docker_container:
-        name: portainer_agent
-        hostname: portaineragent
-        image: portainer/agent:latest
+        name: portainer
+        hostname: portainer
+        image: portainer/portainer-ee:latest
         ports:
-          - 9001:9001
+          - 8000:8000
+          - 9000:9000
+          - 9443:9443
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock
           - /var/lib/docker/volumes:/var/lib/docker/volumes
           - /:/host
+          - "/{{ project_directory }}/mount/portainer_data:/data" 
         pull: true
         restart_policy: "always"
         container_default_behavior: "compatibility"

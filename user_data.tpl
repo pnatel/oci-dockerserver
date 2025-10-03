@@ -39,6 +39,7 @@ project_directory: ${project_directory}
 oci_kms_endpoint: ${oci_kms_endpoint} 
 oci_kms_keyid: ${oci_kms_keyid} 
 zerotier_ntwk_cipher: ${zerotier_ntwk_cipher}
+zerotier_token_cipher: ${zerotier_token_cipher}
 github_cipher: ${github_cipher}
 EOM
 

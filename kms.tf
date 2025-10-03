@@ -198,6 +198,12 @@ resource "oci_kms_encrypted_data" "kms-zerotier-ntwk-secret" {
   plaintext       = base64encode(var.zerotier_ntwk)
 }
 
+resource "oci_kms_encrypted_data" "kms-zerotier-token-secret" {
+  crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
+  key_id          = oci_kms_key.oci-kms-storage-key.id
+  plaintext       = base64encode(var.zerotier_token)
+}
+
 resource "oci_kms_encrypted_data" "kms-ext-github-secret" {
   crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
   key_id          = oci_kms_key.oci-kms-storage-key.id

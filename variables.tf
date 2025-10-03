@@ -123,6 +123,10 @@ variable "zerotier_ntwk" {
   type = string
 }
 
+variable "zerotier_token" {
+  type = string
+}
+
 # -----end---------
 
 # variable "docker_network" {

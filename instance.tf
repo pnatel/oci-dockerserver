@@ -50,8 +50,9 @@ resource "oci_core_instance" "oci-instance" {
         oci_kms_endpoint  = oci_kms_vault.oci-kms-vault.crypto_endpoint
         oci_kms_keyid     = oci_kms_key.oci-kms-storage-key.id
         # -------optional----------
-        github_cipher        = oci_kms_encrypted_data.kms-ext-github-secret.ciphertext
-        zerotier_ntwk_cipher = oci_kms_encrypted_data.kms-zerotier-ntwk-secret.ciphertext
+        github_cipher         = oci_kms_encrypted_data.kms-ext-github-secret.ciphertext
+        zerotier_ntwk_cipher  = oci_kms_encrypted_data.kms-zerotier-ntwk-secret.ciphertext
+        zerotier_token_cipher = oci_kms_encrypted_data.kms-zerotier-token-secret.ciphertext
         # -------end----------
       }
     ))
