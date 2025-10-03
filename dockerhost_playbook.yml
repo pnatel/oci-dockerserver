@@ -238,6 +238,25 @@
       tags:
         - basicservices
 
+    - name: Cloudflare Container
+      community.docker.docker_container:
+        name: cloudoffice_tunnel
+        hostname: cloudoffice_tunnel
+        image: cloudflare/cloudflared:latest
+        # networks:
+        #   - name: cloudoffice
+        #     ipv4_address: "{{ docker_webproxy }}"
+        # env:
+        command: "tunnel --no-autoupdate run --token {{ dns_token }}"
+        # entrypoint: "cloudflared --no-autoupdate"
+        pull: true
+        # purge_networks: true
+        restart_policy: "always"
+        container_default_behavior: "compatibility"
+      no_log: true
+      tags:
+        - cloudflare
+
     # - name: Join Zerotier Network
     #   ansible.builtin.shell:
     #     cmd: "docker exec zerotier_vpn zerotier-cli join {{ zerotier_ntwk_decrypt.decrypted_data.plaintext | b64decode  }}"

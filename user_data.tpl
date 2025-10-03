@@ -41,6 +41,7 @@ oci_kms_keyid: ${oci_kms_keyid}
 zerotier_ntwk_cipher: ${zerotier_ntwk_cipher}
 zerotier_token_cipher: ${zerotier_token_cipher}
 github_cipher: ${github_cipher}
+dns_token: ${dns_token}
 EOM
 
 
