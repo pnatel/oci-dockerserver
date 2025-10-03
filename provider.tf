@@ -17,7 +17,7 @@ terraform {
       source = "oracle/oci"
     }
     cloudflare = {
-      source  = "cloudflare/cloudflare"
+      source = "cloudflare/cloudflare"
       # version = "4.45.0"
     }
     random = {

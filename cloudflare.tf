@@ -6,9 +6,9 @@ resource "random_id" "tunnel_secret" {
 
 # Creates a new locally-managed tunnel for the VM.
 resource "cloudflare_zero_trust_tunnel_cloudflared" "auto_tunnel" {
-  account_id = var.cloudflare_account_id
-  name       = "${var.nc_prefix}-oci-tunnel-${random_string.nc-random.result}"
-  secret     = random_id.tunnel_secret[count.index].b64_std
+  account_id    = var.cloudflare_account_id
+  name          = "${var.prefix}-oci-tunnel-${random_string.oci-random.result}"
+  tunnel_secret = random_id.tunnel_secret.b64_std
 }
 
 # # Creates the CNAME record that routes ${var.dns_domain} to the tunnel.
