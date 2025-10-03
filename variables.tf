@@ -207,11 +207,11 @@ variable "web_port" {
 #   default     = ""
 # }
 
-# variable "dns_token" {
-#   type        = string
-#   description = "DynDNS or Cloudflare token"
-#   default     = ""
-# }
+variable "dns_token" {
+  type        = string
+  description = "DynDNS or Cloudflare token"
+  default     = ""
+}
 
 # variable "letsencrypt_email" {
 #   type    = string
@@ -269,33 +269,33 @@ variable "web_port" {
 #   default     = "0"
 # } */
 
-# # Cloudflare variables
-# variable "cloudflare_zone_id" {
-#   description = "Zone ID for your domain"
-#   type        = string
-#   default     = ""
-# }
+# Cloudflare variables
+variable "cloudflare_zone_id" {
+  description = "Zone ID for your domain"
+  type        = string
+  default     = ""
+}
 
-# variable "cloudflare_account_id" {
-#   description = "Account ID for your Cloudflare account"
-#   type        = string
-#   sensitive   = true
-#   default     = ""
-# }
+variable "cloudflare_account_id" {
+  description = "Account ID for your Cloudflare account"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
 
-# variable "cloudflare_email" {
-#   description = "Email address for your Cloudflare account"
-#   type        = string
-#   sensitive   = true
-#   default     = ""
-# }
+variable "cloudflare_email" {
+  description = "Email address for your Cloudflare account"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
 
-# variable "cloudflare_token" {
-#   description = "Cloudflare API token created at https://dash.cloudflare.com/profile/api-tokens"
-#   type        = string
-#   sensitive   = true
-#   default     = "0123456789012345678901234567890123456789"
-# }
+variable "cloudflare_token" {
+  description = "Cloudflare API token created at https://dash.cloudflare.com/profile/api-tokens"
+  type        = string
+  sensitive   = true
+  default     = "0123456789012345678901234567890123456789"
+}
 
 # #-------Vault----------
 # variable "HCP_CLIENT_ID" {

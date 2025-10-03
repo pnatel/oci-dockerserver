@@ -44,9 +44,9 @@ provider "oci" {
   # auth                = "SecurityToken"
   # config_file_profile = var.config_file_profile
 }
-# provider "cloudflare" {
-#   api_token = var.cloudflare_token
-# }
+provider "cloudflare" {
+  api_token = var.cloudflare_token
+}
 provider "random" {
 }
 
