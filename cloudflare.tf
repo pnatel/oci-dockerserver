@@ -26,8 +26,7 @@ resource "cloudflare_dns_record" "portainer" {
   ttl     = 1
   type    = "CNAME"
   comment = "CNAME record that routes portainer-${var.dns_domain} to the tunnel"
-  content = "xxx.com"
-  # content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
   proxied = true
 }
 
@@ -39,9 +38,9 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
     ingress = [{
       hostname = "portainer-${var.dns_domain}"
       service  = "https://${data.oci_core_instance.oci-instance.private_ip}:9443"
-      #     origin_request = {
-      #       no_tls_verify = false
-      #     }
+      origin_request = {
+        no_tls_verify = false
+      }
       },
       {
         service = "http_status:404"
