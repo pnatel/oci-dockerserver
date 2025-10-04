@@ -58,9 +58,6 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
       origin_request = {
         no_tls_verify = false
       }
-      },
-      {
-        service = "http_status:404"
     }]
     warp_routing = {
       enabled = true
