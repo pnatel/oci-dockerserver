@@ -207,11 +207,11 @@ variable "web_port" {
 #   default     = ""
 # }
 
-variable "dns_token" {
-  type        = string
-  description = "DynDNS or Cloudflare token"
-  default     = ""
-}
+# variable "dns_token" {
+#   type        = string
+#   description = "DynDNS or Cloudflare token"
+#   default     = ""
+# }
 
 # variable "letsencrypt_email" {
 #   type    = string

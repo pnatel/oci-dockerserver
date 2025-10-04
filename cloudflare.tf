@@ -8,7 +8,13 @@ resource "random_id" "tunnel_secret" {
 resource "cloudflare_zero_trust_tunnel_cloudflared" "auto_tunnel" {
   account_id    = var.cloudflare_account_id
   name          = "${var.prefix}-oci-tunnel-${random_string.oci-random.result}"
+  config_src    = "cloudflare"
   tunnel_secret = random_id.tunnel_secret.b64_std
+}
+
+data "cloudflare_zero_trust_tunnel_cloudflared_token" "tunnel_cloudflared_token" {
+  account_id = var.cloudflare_account_id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id
 }
 
 # # Creates the CNAME record that routes ${var.dns_domain} to the tunnel.
