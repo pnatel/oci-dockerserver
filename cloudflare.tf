@@ -39,7 +39,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
       hostname = "portainer-${var.dns_domain}"
       service  = "https://${data.oci_core_instance.oci-instance.private_ip}:9443"
       origin_request = {
-        no_tls_verify = false
+        no_tls_verify = true
       }
       },
       {
