@@ -18,16 +18,6 @@ data "cloudflare_zero_trust_tunnel_cloudflared_token" "tunnel_cloudflared_token"
 }
 
 
-# # Creates the CNAME record that routes portainer-${var.dns_domain} to the tunnel.
-# resource "cloudflare_dns_record" "portainer" {
-#   zone_id = var.cloudflare_zone_id
-#   name    = "portainer-${split(".", var.dns_domain)[0]}"
-#   content = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel[0].cname
-#   type    = "CNAME"
-#   proxied = true
-#   tags = [ "Repo:OCI-Dockerserver" ]
-# }
-
 resource "cloudflare_dns_record" "portainer" {
   zone_id = var.cloudflare_zone_id
   name    = "portainer-${split(".", var.dns_domain)[0]}"
@@ -36,11 +26,7 @@ resource "cloudflare_dns_record" "portainer" {
   comment = "CNAME record that routes portainer-${var.dns_domain} to the tunnel"
   content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
   proxied = true
-  settings = {
-    ipv4_only = true
-    ipv6_only = true
-  }
-  tags = ["repo:oci-dockerserver"]
+  tags    = ["repo:oci-dockerserver"]
 }
 
 data "oci_core_instance" "oci-instance" {
@@ -68,57 +54,6 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
   # }
 }
 
-resource "cloudflare_zero_trust_tunnel_cloudflared_config" "example_zero_trust_tunnel_cloudflared_config" {
-  account_id = "023e105f4ecef8ad9ca31a8372d0c353"
-  tunnel_id  = "f70ff985-a4ef-4643-bbbc-4a0ed4fc8415"
-  config = {
-    ingress = [{
-      hostname = "tunnel.example.com"
-      service  = "https://localhost:8001"
-      origin_request = {
-        access = {
-          aud_tag   = ["string"]
-          team_name = "zero-trust-organization-name"
-          required  = false
-        }
-        ca_pool                  = "caPool"
-        connect_timeout          = 10
-        disable_chunked_encoding = true
-        http2_origin             = true
-        http_host_header         = "httpHostHeader"
-        keep_alive_connections   = 100
-        keep_alive_timeout       = 90
-        no_happy_eyeballs        = false
-        no_tls_verify            = false
-        origin_server_name       = "originServerName"
-        proxy_type               = "proxyType"
-        tcp_keep_alive           = 30
-        tls_timeout              = 10
-      }
-      path = "subpath"
-    }]
-    origin_request = {
-      access = {
-        aud_tag   = ["string"]
-        team_name = "zero-trust-organization-name"
-        required  = false
-      }
-      ca_pool                  = "caPool"
-      connect_timeout          = 10
-      disable_chunked_encoding = true
-      http2_origin             = true
-      http_host_header         = "httpHostHeader"
-      keep_alive_connections   = 100
-      keep_alive_timeout       = 90
-      no_happy_eyeballs        = false
-      no_tls_verify            = false
-      origin_server_name       = "originServerName"
-      proxy_type               = "proxyType"
-      tcp_keep_alive           = 30
-      tls_timeout              = 10
-    }
-  }
-}
 
 # --------- BUG: Causes passwords app to fail to fetch (among other stuff) -------------
 # Creates an Access application to control who can connect to Nextcloud.
