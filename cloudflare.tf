@@ -51,18 +51,21 @@ data "oci_core_instance" "oci-instance" {
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id
   account_id = var.cloudflare_account_id
-  config = {
-    ingress = [{
-      hostname = "portainer-${var.dns_domain}"
-      service  = "https://${data.oci_core_instance.oci-instance.private_ip}:9443"
-      origin_request = {
-        no_tls_verify = false
-      }
-    }]
-    warp_routing = {
-      enabled = true
-    }
-  }
+  # config = {
+  #   ingress = [{
+  #     hostname = "portainer-${var.dns_domain}"
+  #     service  = "https://${data.oci_core_instance.oci-instance.private_ip}:9443"
+  #     origin_request = {
+  #       no_tls_verify = false
+  #     }
+  #     },
+  #     {
+  #       service = "http_status:404"
+  #   }]
+  #   warp_routing = {
+  #     enabled = true
+  #   }
+  # }
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "example_zero_trust_tunnel_cloudflared_config" {
