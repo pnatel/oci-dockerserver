@@ -179,7 +179,7 @@
         network_mode: host
         env:
           ZEROTIER_API_SECRET: "{{ zerotier_token_decrypt.decrypted_data.plaintext | b64decode  }}"
-        command: {{ zerotier_ntwk_decrypt.decrypted_data.plaintext | b64decode  }}
+        command: "{{ zerotier_ntwk_decrypt.decrypted_data.plaintext | b64decode  }}"
         capabilities:
           - NET_ADMIN
           - SYS_ADMIN
