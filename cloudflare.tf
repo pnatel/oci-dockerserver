@@ -45,9 +45,9 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
       {
         service = "http_status:404"
     }]
-    #   warp_routing = {
-    #     enabled = true
-    #   }
+      warp_routing = {
+        enabled = true
+      }
   }
 }
 
