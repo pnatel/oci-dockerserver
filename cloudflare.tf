@@ -49,7 +49,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
   #   warp_routing = {
   #     enabled = true
   #   }
-  # }
+  }
 }
 
 
