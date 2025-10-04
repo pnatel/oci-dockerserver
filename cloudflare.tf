@@ -17,63 +17,50 @@ data "cloudflare_zero_trust_tunnel_cloudflared_token" "tunnel_cloudflared_token"
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id
 }
 
-# # Creates the CNAME record that routes ${var.dns_domain} to the tunnel.
-# resource "cloudflare_record" "nextcloud_app" {
+
+# # Creates the CNAME record that routes portainer-${var.dns_domain} to the tunnel.
+# resource "cloudflare_dns_record" "portainer" {
 #   zone_id = var.cloudflare_zone_id
-#   name    = split(".", var.dns_domain)[0]
-#   content = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel[count.index].cname
+#   name    = "portainer-${split(".", var.dns_domain)[0]}"
+#   content = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel[0].cname
 #   type    = "CNAME"
 #   proxied = true
+#   tags = [ "Repo:OCI-Dockerserver" ]
 # }
 
-# # Creates the CNAME record that routes oo-${var.dns_domain} to the tunnel.
-# resource "cloudflare_record" "onlyoffice_app" {
-#   zone_id = var.cloudflare_zone_id
-#   name    = "oo-${split(".", var.dns_domain)[0]}"
-#   content = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel[count.index].cname
-#   type    = "CNAME"
-#   proxied = true
-# }
+resource "cloudflare_dns_record" "portainer" {
+  zone_id = var.cloudflare_zone_id
+  name    = "portainer-${split(".", var.dns_domain)[0]}"
+  ttl     = 3600
+  type    = "CNAME"
+  comment = "CNAME record that routes portainer-${var.dns_domain} to the tunnel"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
+  proxied = true
+  settings = {
+    ipv4_only = true
+    ipv6_only = true
+  }
+  tags = ["repo:oci-dockerserver"]
+}
 
-# Create s CNAME record for the Talk Backend.
-# resource "cloudflare_record" "nextcloud_talk_backend" {
-#   count   = var.enable_dns == 2 ? 1 : 0
-#   zone_id = var.cloudflare_zone_id
-#   name    = "signaling-${split(".", var.dns_domain)[0]}"
-#   content = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel[count.index].cname
-#   type    = "CNAME"
-#   proxied = true
-# }
+data "oci_core_instance" "oci-instance" {
+  instance_id = oci_core_instance.oci-instance.id
+}
 
-# # Creates the configuration for the tunnel.
-# resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
-#   count      = var.enable_dns == 2 ? 1 : 0
-#   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel[count.index].id
-#   account_id = var.cloudflare_account_id
-#   config {
-#     ingress_rule {
-#       hostname = cloudflare_record.nextcloud_app[count.index].hostname
-#       service  = "http://${var.docker_nextcloud}"
-#     }
-#     ingress_rule {
-#       hostname = cloudflare_record.onlyoffice_app[count.index].hostname
-#       service  = "https://${var.docker_onlyoffice}"
-#       origin_request {
-#         no_tls_verify = true
-#       }
-#     }
-#     # ingress_rule {
-#     #   hostname = cloudflare_record.nextcloud_talk_backend[count.index].hostname
-#     #   service  = "http://${var.docker_talk_hpb}:8081"
-#     # }
-#     ingress_rule {
-#       service = "http_status:404"
-#     }
-#     warp_routing {
-#       enabled = true
-#     }
-#   }
-# }
+# Creates the configuration for the tunnel.
+resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id
+  account_id = var.cloudflare_account_id
+  config = {
+    ingress_rule = [{
+      hostname = "portainer-${var.dns_domain}"
+      service  = "https://${data.oci_core_instance.oci-instance.private_ip}:9443"
+      },
+      {
+        service = "http_status:404"
+    }]
+  }
+}
 
 # --------- BUG: Causes passwords app to fail to fetch (among other stuff) -------------
 # Creates an Access application to control who can connect to Nextcloud.

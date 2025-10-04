@@ -201,11 +201,11 @@ variable "web_port" {
 #   default     = 0
 # }
 
-# variable "dns_domain" {
-#   type        = string
-#   description = "FQDN"
-#   default     = ""
-# }
+variable "dns_domain" {
+  type        = string
+  description = "FQDN"
+  default     = "br.thecraftkeeper.com"
+}
 
 # variable "dns_token" {
 #   type        = string
