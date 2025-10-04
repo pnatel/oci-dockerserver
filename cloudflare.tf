@@ -1,3 +1,11 @@
+data "cloudflare_zero_trust_tunnel_cloudflared_token" "tunnel_cloudflared_token" {
+  account_id = var.cloudflare_account_id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id
+}
+
+data "oci_core_instance" "oci-instance" {
+  instance_id = oci_core_instance.oci-instance.id
+}
 
 # Generates a 35-character secret for the tunnel.
 resource "random_id" "tunnel_secret" {
@@ -12,42 +20,32 @@ resource "cloudflare_zero_trust_tunnel_cloudflared" "auto_tunnel" {
   tunnel_secret = random_id.tunnel_secret.b64_std
 }
 
-data "cloudflare_zero_trust_tunnel_cloudflared_token" "tunnel_cloudflared_token" {
-  account_id = var.cloudflare_account_id
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id
-}
-
-
 resource "cloudflare_dns_record" "portainer" {
   zone_id = var.cloudflare_zone_id
   name    = "portainer-${split(".", var.dns_domain)[0]}"
   ttl     = 1
   type    = "CNAME"
   comment = "CNAME record that routes portainer-${var.dns_domain} to the tunnel"
-  content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
+  content = "xxx.com" 
+  # content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
   proxied = true
-  tags    = ["repo:oci-dockerserver"]
-}
-
-data "oci_core_instance" "oci-instance" {
-  instance_id = oci_core_instance.oci-instance.id
 }
 
 # Creates the configuration for the tunnel.
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id
   account_id = var.cloudflare_account_id
-  # config = {
-  #   ingress = [{
-  #     hostname = "portainer-${var.dns_domain}"
-  #     service  = "https://${data.oci_core_instance.oci-instance.private_ip}:9443"
+  config = {
+    ingress = [{
+      hostname = "portainer-${var.dns_domain}"
+      service  = "https://${data.oci_core_instance.oci-instance.private_ip}:9443"
   #     origin_request = {
   #       no_tls_verify = false
   #     }
   #     },
   #     {
   #       service = "http_status:404"
-  #   }]
+    }]
   #   warp_routing = {
   #     enabled = true
   #   }
