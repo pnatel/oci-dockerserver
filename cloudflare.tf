@@ -31,7 +31,7 @@ data "cloudflare_zero_trust_tunnel_cloudflared_token" "tunnel_cloudflared_token"
 resource "cloudflare_dns_record" "portainer" {
   zone_id = var.cloudflare_zone_id
   name    = "portainer-${split(".", var.dns_domain)[0]}"
-  ttl     = 3600
+  ttl     = 1
   type    = "CNAME"
   comment = "CNAME record that routes portainer-${var.dns_domain} to the tunnel"
   content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
@@ -52,13 +52,71 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id
   account_id = var.cloudflare_account_id
   config = {
-    ingress_rule = [{
+    ingress = [{
       hostname = "portainer-${var.dns_domain}"
       service  = "https://${data.oci_core_instance.oci-instance.private_ip}:9443"
+      origin_request = {
+        no_tls_verify = false
+      }
       },
       {
         service = "http_status:404"
     }]
+    warp_routing = {
+      enabled = true
+    }
+  }
+}
+
+resource "cloudflare_zero_trust_tunnel_cloudflared_config" "example_zero_trust_tunnel_cloudflared_config" {
+  account_id = "023e105f4ecef8ad9ca31a8372d0c353"
+  tunnel_id  = "f70ff985-a4ef-4643-bbbc-4a0ed4fc8415"
+  config = {
+    ingress = [{
+      hostname = "tunnel.example.com"
+      service  = "https://localhost:8001"
+      origin_request = {
+        access = {
+          aud_tag   = ["string"]
+          team_name = "zero-trust-organization-name"
+          required  = false
+        }
+        ca_pool                  = "caPool"
+        connect_timeout          = 10
+        disable_chunked_encoding = true
+        http2_origin             = true
+        http_host_header         = "httpHostHeader"
+        keep_alive_connections   = 100
+        keep_alive_timeout       = 90
+        no_happy_eyeballs        = false
+        no_tls_verify            = false
+        origin_server_name       = "originServerName"
+        proxy_type               = "proxyType"
+        tcp_keep_alive           = 30
+        tls_timeout              = 10
+      }
+      path = "subpath"
+    }]
+    origin_request = {
+      access = {
+        aud_tag   = ["string"]
+        team_name = "zero-trust-organization-name"
+        required  = false
+      }
+      ca_pool                  = "caPool"
+      connect_timeout          = 10
+      disable_chunked_encoding = true
+      http2_origin             = true
+      http_host_header         = "httpHostHeader"
+      keep_alive_connections   = 100
+      keep_alive_timeout       = 90
+      no_happy_eyeballs        = false
+      no_tls_verify            = false
+      origin_server_name       = "originServerName"
+      proxy_type               = "proxyType"
+      tcp_keep_alive           = 30
+      tls_timeout              = 10
+    }
   }
 }
 
