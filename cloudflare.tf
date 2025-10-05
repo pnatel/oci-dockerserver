@@ -41,6 +41,10 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
       {
         service = "http_status:404"
     }]
+    # READ ONLY LINKED WITH ERROR ON DEPLOYMENT
+    # warp_routing = {
+    #   enabled = true
+    # }
   }
 }
 
@@ -49,16 +53,20 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
 resource "cloudflare_zero_trust_access_application" "portainer_app" {
   zone_id                     = var.cloudflare_zone_id
   allow_authenticate_via_warp = true
-  name                        = "Access application for portainer-${var.dns_domain}"
+  name                        = "Access application for portainer-${split(".", var.dns_domain)[0]}"
   domain                      = "portainer-${var.dns_domain}"
   type                        = "self_hosted"
   session_duration            = "24h"
+  policies = [{
+    id         = cloudflare_zero_trust_access_policy.portainer_policy.id
+    precedence = 1
+  }]
 }
 
 # Creates an Access policy for the application.
 resource "cloudflare_zero_trust_access_policy" "portainer_policy" {
   account_id = var.cloudflare_account_id
-  name       = "Policy for portainer-${var.dns_domain}"
+  name       = "Policy for portainer-${split(".", var.dns_domain)[0]}"
   decision   = "allow"
   include = [{
     email_domain = {
