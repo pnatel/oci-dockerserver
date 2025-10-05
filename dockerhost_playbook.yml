@@ -259,7 +259,7 @@
         image: cloudflare/cloudflared:latest
         networks:
           - name: oci-dockerserver-ntwrk
-            ipv4_address: "{{ docker_cloudflare }}"
+            ipv4_address: "{{ docker_cloudflare_tunnel }}"
         # env:
         command: "tunnel --no-autoupdate run --token {{ dns_token }}"
         # entrypoint: "cloudflared --no-autoupdate"
