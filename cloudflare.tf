@@ -45,36 +45,34 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
 }
 
 
-# --------- BUG: Causes passwords app to fail to fetch (among other stuff) -------------
 # Creates an Access application to control who can connect to Nextcloud.
-# resource "cloudflare_zero_trust_access_application" "nextcloud_app" {
-#   count            = var.enable_dns == 2 ? 1 : 0
-#   zone_id          = var.cloudflare_zone_id
-#   name             = "Access application for ${var.dns_domain}"
-#   domain           = var.dns_domain
-#   session_duration = "24h"
-# }
+resource "cloudflare_zero_trust_access_application" "portainer_app" {
+  zone_id          = var.cloudflare_zone_id
+  name             = "Access application for portainer-${var.dns_domain}"
+  domain           = var.dns_domain
+  session_duration = "24h"
+}
 
-# # Creates an Access policy for the application.
-# resource "cloudflare_zero_trust_access_policy" "nextcloud_policy" {
-#   count          = var.enable_dns == 2 ? 1 : 0
-#   application_id = cloudflare_zero_trust_access_application.nextcloud_app[count.index].id
-#   zone_id        = var.cloudflare_zone_id
-#   name           = "Policy for ${var.dns_domain}"
-#   precedence     = "1"
-#   decision       = "allow"
-#   include {
-#     # email = [var.cloudflare_email]
-#     email_domain = [split("@", var.cloudflare_email)[1]]
-#   }
-# }
+# Creates an Access policy for the application.
+resource "cloudflare_zero_trust_access_policy" "portainer_policy" {
+  account_id = var.cloudflare_account_id
+
+  # application_id = cloudflare_zero_trust_access_application.portainer_app.id
+  # zone_id        = var.cloudflare_zone_id
+  name           = "Policy for ${var.dns_domain}"
+  # precedence     = "1"
+  decision       = "allow"
+  include = [{
+    # email = [var.cloudflare_email]
+    email_domain = [split("@", var.cloudflare_email)[1]]
+  }]
+}
 
 # # Creates a bypass rule to allow access to local applications to the Nextcloud app without authentication.
 
 # resource "cloudflare_zero_trust_access_policy" "nextcloud_bypass" {
-#   count          = var.enable_dns == 2 ? 1 : 0
 #   zone_id        = var.cloudflare_zone_id
-#   application_id = cloudflare_zero_trust_access_application.nextcloud_app[count.index].id
+#   application_id = cloudflare_zero_trust_access_application.nextcloud_app.id
 #   name           = "Bypass rule for ${var.dns_domain}"
 #   precedence     = "2"
 #   decision       = "bypass"
