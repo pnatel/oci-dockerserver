@@ -129,41 +129,35 @@ variable "zerotier_token" {
 
 # -----end---------
 
-# variable "docker_network" {
-#   type        = string
-#   description = "docker network ip"
-#   default     = "172.18.1.0"
-# }
+variable "docker_network" {
+  type        = string
+  description = "docker network ip"
+  default     = "172.18.1.0"
+}
 
-# variable "docker_gw" {
-#   type        = string
-#   description = "docker network gateway ip"
-#   default     = "172.18.1.1"
-# }
+variable "docker_gw" {
+  type        = string
+  description = "docker network gateway ip"
+  default     = "172.18.1.1"
+}
 
-# variable "docker_nextcloud" {
-#   type        = string
-#   description = "nextcloud app container ip"
-#   default     = "172.18.1.2"
-# }
+variable "docker_portainer" {
+  type        = string
+  description = "portainer app container ip"
+  default     = "172.18.1.2"
+}
 
-# variable "docker_webproxy" {
-#   type        = string
-#   description = "https web proxy container ip"
-#   default     = "172.18.1.3"
-# }
+variable "docker_cloudflare_tunnel" {
+  type        = string
+  description = "Cloudflare Tunnel container ip"
+  default     = "172.18.1.3"
+}
 
-# variable "docker_db" {
-#   type        = string
-#   description = "db container ip"
-#   default     = "172.18.1.4"
-# }
-
-# variable "docker_redis" {
-#   type        = string
-#   description = "Redis container ip"
-#   default     = "172.18.1.5"
-# }
+variable "docker_watchtower" {
+  type        = string
+  description = "Watchtower container ip"
+  default     = "172.18.1.4"
+}
 
 # variable "docker_onlyoffice" {
 #   type        = string
@@ -189,11 +183,11 @@ variable "project_directory" {
   default     = "/docker"
 }
 
-variable "web_port" {
-  type        = string
-  description = "Port to run web proxy"
-  default     = "443"
-}
+# variable "web_port" {
+#   type        = string
+#   description = "Port to run web proxy"
+#   default     = "443"
+# }
 
 # variable "enable_dns" {
 #   type        = number

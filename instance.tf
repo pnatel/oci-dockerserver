@@ -42,14 +42,18 @@ resource "oci_core_instance" "oci-instance" {
     user_data = base64encode(templatefile(
       "user_data.tpl",
       {
-        oci_region        = local.oci_region
-        tenancy_ocid      = var.tenancy_ocid
-        web_port          = var.web_port
-        project_directory = var.project_directory
-        project_url       = var.project_url
-        oci_kms_endpoint  = oci_kms_vault.oci-kms-vault.crypto_endpoint
-        oci_kms_keyid     = oci_kms_key.oci-kms-storage-key.id
-        dns_token         = data.cloudflare_zero_trust_tunnel_cloudflared_token.tunnel_cloudflared_token.token
+        oci_region               = local.oci_region
+        tenancy_ocid             = var.tenancy_ocid
+        docker_network           = var.docker_network
+        docker_gw                = var.docker_gw
+        docker_portainer         = var.docker_portainer
+        docker_watchtower        = var.docker_watchtower
+        docker_cloudflare_tunnel = var.docker_cloudflare_tunnel
+        project_directory        = var.project_directory
+        project_url              = var.project_url
+        oci_kms_endpoint         = oci_kms_vault.oci-kms-vault.crypto_endpoint
+        oci_kms_keyid            = oci_kms_key.oci-kms-storage-key.id
+        dns_token                = data.cloudflare_zero_trust_tunnel_cloudflared_token.tunnel_cloudflared_token.token
         # -------optional----------
         github_cipher         = oci_kms_encrypted_data.kms-ext-github-secret.ciphertext
         zerotier_ntwk_cipher  = oci_kms_encrypted_data.kms-zerotier-ntwk-secret.ciphertext

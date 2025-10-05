@@ -167,7 +167,15 @@
       when: not scripts_repo_state.stat.exists
       # ignore_errors: true
 
-
+# -------DOCKER CONTAINERS---------
+    - name: Docker network
+      community.docker.docker_network:
+        name: oci-dockerserver-ntwrk
+        driver: bridge
+        ipam_config:
+          - subnet: "{{ docker_network }}/24"
+            gateway: "{{ docker_gw }}"
+    
     # Configure a VPN client
     - name: Zerotier container VPN
       community.docker.docker_container:
@@ -200,6 +208,9 @@
         name: portainer
         hostname: portainer
         image: portainer/portainer-ee:latest
+        networks:
+          - name: oci-dockerserver-ntwrk
+            ipv4_address: "{{ docker_portainer }}"
         ports:
           - 8000:8000
           - 9000:9000
@@ -223,6 +234,9 @@
         image: containrrr/watchtower
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock
+        networks:
+          - name: oci-dockerserver-ntwrk
+            ipv4_address: "{{ docker_watchtower }}"
         env:
           WATCHTOWER_CLEANUP: "true"
           TZ: Australia/Brisbane
@@ -243,9 +257,9 @@
         name: dockerhost_tunnel
         hostname: dockerhost_tunnel
         image: cloudflare/cloudflared:latest
-        # networks:
-        #   - name: cloudoffice
-        #     ipv4_address: "{{ docker_webproxy }}"
+        networks:
+          - name: oci-dockerserver-ntwrk
+            ipv4_address: "{{ docker_cloudflare }}"
         # env:
         command: "tunnel --no-autoupdate run --token {{ dns_token }}"
         # entrypoint: "cloudflared --no-autoupdate"

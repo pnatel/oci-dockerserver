@@ -3,10 +3,6 @@ data "cloudflare_zero_trust_tunnel_cloudflared_token" "tunnel_cloudflared_token"
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id
 }
 
-data "oci_core_instance" "oci-instance" {
-  instance_id = oci_core_instance.oci-instance.id
-}
-
 # Generates a 35-character secret for the tunnel.
 resource "random_id" "tunnel_secret" {
   byte_length = 35
@@ -37,7 +33,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
   config = {
     ingress = [{
       hostname = "portainer-${var.dns_domain}"
-      service  = "https://${data.oci_core_instance.oci-instance.private_ip}:9443"
+      service  = "https://${var.docker_portainer}:9443"
       origin_request = {
         no_tls_verify = true
       }
@@ -45,9 +41,6 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
       {
         service = "http_status:404"
     }]
-    # warp_routing = {
-    #   enabled = true
-    # }
   }
 }
 
