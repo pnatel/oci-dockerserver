@@ -47,26 +47,26 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
 
 # Creates an Access application to control who can connect to Nextcloud.
 resource "cloudflare_zero_trust_access_application" "portainer_app" {
-  zone_id          = var.cloudflare_zone_id
-  name             = "Access application for portainer-${var.dns_domain}"
-  domain           = var.dns_domain
-  session_duration = "24h"
+  zone_id                     = var.cloudflare_zone_id
+  allow_authenticate_via_warp = true
+  name                        = "Access application for portainer-${var.dns_domain}"
+  domain                      = var.dns_domain
+  type                        = "self_hosted"
+  session_duration            = "24h"
 }
 
 # Creates an Access policy for the application.
 resource "cloudflare_zero_trust_access_policy" "portainer_policy" {
   account_id = var.cloudflare_account_id
-
-  # application_id = cloudflare_zero_trust_access_application.portainer_app.id
-  # zone_id        = var.cloudflare_zone_id
-  name           = "Policy for ${var.dns_domain}"
-  # precedence     = "1"
-  decision       = "allow"
+  name       = "Policy for ${var.dns_domain}"
+  decision   = "allow"
   include = [{
-    # email = [var.cloudflare_email]
-    email_domain = [split("@", var.cloudflare_email)[1]]
+    email_domain = {
+      domain = split("@", var.cloudflare_email)[1]
+    }
   }]
 }
+
 
 # # Creates a bypass rule to allow access to local applications to the Nextcloud app without authentication.
 
