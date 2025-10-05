@@ -34,11 +34,11 @@ mkdir -p ${project_directory}
 tee ${project_directory}/dockerhost-vars.yaml << EOM
 oci_region: ${oci_region} 
 tenancy_ocid: ${tenancy_ocid} 
-docker_network: ${var.docker_network}
-docker_gw: ${var.docker_gw}
-docker_portainer: ${var.docker_portainer}
-docker_watchtower: ${var.docker_watchtower}
-docker_cloudflare_tunnel: ${var.docker_cloudflare_tunnel}
+docker_network: ${docker_network}
+docker_gw: ${docker_gw}
+docker_portainer: ${docker_portainer}
+docker_watchtower: ${docker_watchtower}
+docker_cloudflare_tunnel: ${docker_cloudflare_tunnel}
 project_directory: ${project_directory} 
 oci_kms_endpoint: ${oci_kms_endpoint} 
 oci_kms_keyid: ${oci_kms_keyid} 
