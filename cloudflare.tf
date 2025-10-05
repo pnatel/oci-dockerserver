@@ -50,7 +50,7 @@ resource "cloudflare_zero_trust_access_application" "portainer_app" {
   zone_id                     = var.cloudflare_zone_id
   allow_authenticate_via_warp = true
   name                        = "Access application for portainer-${var.dns_domain}"
-  domain                      = var.dns_domain
+  domain                      = "portainer-${var.dns_domain}"
   type                        = "self_hosted"
   session_duration            = "24h"
 }
@@ -58,7 +58,7 @@ resource "cloudflare_zero_trust_access_application" "portainer_app" {
 # Creates an Access policy for the application.
 resource "cloudflare_zero_trust_access_policy" "portainer_policy" {
   account_id = var.cloudflare_account_id
-  name       = "Policy for ${var.dns_domain}"
+  name       = "Policy for portainer-${var.dns_domain}"
   decision   = "allow"
   include = [{
     email_domain = {
