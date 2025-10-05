@@ -297,13 +297,12 @@
       with_items:
         - "#!/bin/bash"
         - "# install and configure onlyoffice connector"
-        - # Change to directory
+        - "# Change to directory"
         - "cd {{ project_directory }}/git/oci-dockerhost"
-        - # Ensure up-to-date
-        - git pull
-        - # Execute playbook
-        - ansible-playbook dockerhost_playbook.yml --extra-vars '@{{ project_directory }}/dockerhost-vars.yaml' 
-
+        - "# Ensure up-to-date"
+        - "git pull"
+        - "# Execute playbook"
+        - "ansible-playbook dockerhost_playbook.yml --extra-vars '@{{ project_directory }}/dockerhost-vars.yaml'"
     - name: Capture end time
       set_fact:
         end_time: "{{ ansible_date_time.iso8601 }}"
