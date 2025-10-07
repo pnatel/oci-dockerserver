@@ -17,11 +17,12 @@ resource "cloudflare_zero_trust_tunnel_cloudflared" "auto_tunnel" {
 }
 
 resource "cloudflare_dns_record" "portainer" {
+  count   = length(var.applist)
   zone_id = var.cloudflare_zone_id
-  name    = "portainer-${split(".", var.dns_domain)[0]}"
+  name    = "${var.applist[count.index].hostname}-${split(".", var.dns_domain)[0]}"
   ttl     = 1
   type    = "CNAME"
-  comment = "CNAME record that routes portainer-${var.dns_domain} to the tunnel"
+  comment = "CNAME record that routes ${var.applist[count.index].hostname}${var.dns_domain} to the tunnel"
   content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
   proxied = true
 }
@@ -38,6 +39,14 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
         no_tls_verify = true
       }
       },
+      {
+        hostname = "overseerr-${var.dns_domain}"
+        service  = "http://172.19.0.4:7777"
+      },
+      # {
+      #   hostname = "overseerr-${var.dns_domain}"
+      #   service  = "http://172.19.0.4:7777"
+      # },
       {
         service = "http_status:404"
     }]

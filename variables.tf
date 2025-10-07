@@ -312,3 +312,26 @@ variable "preserve_boot_volume" {
 #   description = "retention_seconds - How long, in seconds, to keep the volume backups created by this schedule."
 #   default     = 2419200 # 4 weeks
 # }
+
+variable "applist" {
+  type = list(object({
+    hostname           = string
+    # service            = string
+    # origin_server_name = optional(string)
+    # no_tls_verify      = optional(bool)
+  }))
+  default = [
+    {
+      hostname = "portainer"
+      #       service  = "https://${var.docker_portainer}:9443"
+    },
+    {
+      hostname = "overseerr"
+    } #,
+    # {
+    #   hostname           = "plex"
+    #   service            = "https://192.168.86.4:32400"
+    #   origin_server_name = "*.0dad5e2b20ec42af9db1ec6f3a1693dc.plex.direct"
+    # }
+  ]
+}
