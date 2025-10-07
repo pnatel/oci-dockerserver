@@ -322,11 +322,14 @@ variable "applist" {
   }))
   default = [
     {
-      hostname = "portainer"
+      hostname = "portainer_"
       #       service  = "https://${var.docker_portainer}:9443"
     },
     {
-      hostname = "overseerr"
+      hostname = "overseerr_"
+    },
+    {
+      hostname = "prowlarr_"
     } #,
     # {
     #   hostname           = "plex"

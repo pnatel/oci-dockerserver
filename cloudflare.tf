@@ -19,7 +19,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared" "auto_tunnel" {
 resource "cloudflare_dns_record" "tunnel_dns_record" {
   count   = length(var.applist)
   zone_id = var.cloudflare_zone_id
-  name    = "${var.applist[count.index].hostname}-${split(".", var.dns_domain)[0]}"
+  name    = "${var.applist[count.index].hostname}${split(".", var.dns_domain)[0]}"
   ttl     = 1
   type    = "CNAME"
   comment = "CNAME record that routes ${var.applist[count.index].hostname}${var.dns_domain} to the tunnel"
@@ -32,8 +32,8 @@ resource "cloudflare_zero_trust_access_application" "access_app" {
   count   = length(var.applist)
   zone_id                     = var.cloudflare_zone_id
   allow_authenticate_via_warp = true
-  name                        = "Access application for ${var.applist[count.index].hostname}-${split(".", var.dns_domain)[0]}"
-  domain                      = "${var.applist[count.index].hostname}-${var.dns_domain}"
+  name                        = "Access application for ${var.applist[count.index].hostname}${split(".", var.dns_domain)[0]}"
+  domain                      = "${var.applist[count.index].hostname}${var.dns_domain}"
   type                        = "self_hosted"
   session_duration            = "24h"
   policies = [{
@@ -48,20 +48,20 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
   account_id = var.cloudflare_account_id
   config = {
     ingress = [{
-      hostname = "portainer-${var.dns_domain}"
+      hostname = "portainer${var.dns_domain}"
       service  = "https://${var.docker_portainer}:9443"
       origin_request = {
         no_tls_verify = true
       }
       },
       {
-        hostname = "overseerr-${var.dns_domain}"
+        hostname = "overseerr${var.dns_domain}"
         service  = "http://172.18.1.5:7777"
       },
-      # {
-      #   hostname = "overseerr-${var.dns_domain}"
-      #   service  = "http://172.19.0.4:7777"
-      # },
+      {
+        hostname = "prowlarr${var.dns_domain}"
+        service  = "http://172.18.1.6:9696"
+      },
       {
         service = "http_status:404"
     }]
@@ -73,9 +73,9 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
 }
 
 # Creates an Access policy for the application.
-resource "cloudflare_zero_trust_access_policy" "portainer_policy" {
+resource "cloudflare_zero_trust_access_policy" "site_policy" {
   account_id = var.cloudflare_account_id
-  name       = "Policy for portainer-${split(".", var.dns_domain)[0]}"
+  name       = "Policy for ${var.dns_domain} sites"
   decision   = "allow"
   include = [{
     email_domain = {
