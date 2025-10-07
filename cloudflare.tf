@@ -37,7 +37,7 @@ resource "cloudflare_zero_trust_access_application" "access_app" {
   type                        = "self_hosted"
   session_duration            = "24h"
   policies = [{
-    id         = cloudflare_zero_trust_access_policy.portainer_policy.id
+    id         = cloudflare_zero_trust_access_policy.site_policy.id
     precedence = 1
   }]
 }
