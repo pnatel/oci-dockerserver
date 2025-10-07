@@ -16,7 +16,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared" "auto_tunnel" {
   tunnel_secret = random_id.tunnel_secret.b64_std
 }
 
-resource "cloudflare_dns_record" "portainer" {
+resource "cloudflare_dns_record" "tunnel_dns_record" {
   count   = length(var.applist)
   zone_id = var.cloudflare_zone_id
   name    = "${var.applist[count.index].hostname}-${split(".", var.dns_domain)[0]}"
@@ -25,6 +25,21 @@ resource "cloudflare_dns_record" "portainer" {
   comment = "CNAME record that routes ${var.applist[count.index].hostname}${var.dns_domain} to the tunnel"
   content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
   proxied = true
+}
+
+# Creates an Access application to control who can connect to Nextcloud.
+resource "cloudflare_zero_trust_access_application" "access_app" {
+  count   = length(var.applist)
+  zone_id                     = var.cloudflare_zone_id
+  allow_authenticate_via_warp = true
+  name                        = "Access application for ${var.applist[count.index].hostname}-${split(".", var.dns_domain)[0]}"
+  domain                      = "${var.applist[count.index].hostname}-${var.dns_domain}"
+  type                        = "self_hosted"
+  session_duration            = "24h"
+  policies = [{
+    id         = cloudflare_zero_trust_access_policy.portainer_policy.id
+    precedence = 1
+  }]
 }
 
 # Creates the configuration for the tunnel.
@@ -41,7 +56,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
       },
       {
         hostname = "overseerr-${var.dns_domain}"
-        service  = "http://172.19.0.4:7777"
+        service  = "http://172.18.1.5:7777"
       },
       # {
       #   hostname = "overseerr-${var.dns_domain}"
@@ -55,21 +70,6 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
     #   enabled = true
     # }
   }
-}
-
-
-# Creates an Access application to control who can connect to Nextcloud.
-resource "cloudflare_zero_trust_access_application" "portainer_app" {
-  zone_id                     = var.cloudflare_zone_id
-  allow_authenticate_via_warp = true
-  name                        = "Access application for portainer-${split(".", var.dns_domain)[0]}"
-  domain                      = "portainer-${var.dns_domain}"
-  type                        = "self_hosted"
-  session_duration            = "24h"
-  policies = [{
-    id         = cloudflare_zero_trust_access_policy.portainer_policy.id
-    precedence = 1
-  }]
 }
 
 # Creates an Access policy for the application.
