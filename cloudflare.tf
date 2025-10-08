@@ -63,6 +63,10 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
         service  = "http://172.18.1.6:9696"
       },
       {
+        hostname = "vscode_${var.dns_domain}"
+        service = "https://172.20.0.2:8443"
+      }
+      {
         service = "http_status:404"
     }]
     # READ ONLY LINKED WITH ERROR ON DEPLOYMENT

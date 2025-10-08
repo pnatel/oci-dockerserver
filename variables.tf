@@ -330,6 +330,9 @@ variable "applist" {
     },
     {
       hostname = "prowlarr_"
+    },
+    {
+      hostname = "vscode_"
     } #,
     # {
     #   hostname           = "plex"
