@@ -315,7 +315,7 @@ variable "preserve_boot_volume" {
 
 variable "applist" {
   type = list(object({
-    hostname           = string
+    hostname = string
     # service            = string
     # origin_server_name = optional(string)
     # no_tls_verify      = optional(bool)
