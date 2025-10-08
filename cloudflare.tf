@@ -65,7 +65,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
       },
       {
         hostname = "vscode_${var.dns_domain}"
-        service  = "https://172.18.1.10:8443"
+        service  = "http://172.18.1.10:8443"
       },
       {
         service = "http_status:404"
