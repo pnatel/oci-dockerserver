@@ -48,18 +48,18 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
   account_id = var.cloudflare_account_id
   config = {
     ingress = [{
-      hostname = "portainer${var.dns_domain}"
+      hostname = "portainer_${var.dns_domain}"
       service  = "https://${var.docker_portainer}:9443"
       origin_request = {
         no_tls_verify = true
       }
       },
       {
-        hostname = "overseerr${var.dns_domain}"
+        hostname = "overseerr_${var.dns_domain}"
         service  = "http://172.18.1.5:7777"
       },
       {
-        hostname = "prowlarr${var.dns_domain}"
+        hostname = "prowlarr_${var.dns_domain}"
         service  = "http://172.18.1.6:9696"
       },
       {
