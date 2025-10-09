@@ -16,6 +16,13 @@ resource "cloudflare_zero_trust_tunnel_cloudflared" "auto_tunnel" {
   tunnel_secret = random_id.tunnel_secret.b64_std
 }
 
+resource "cloudflare_zero_trust_tunnel_warp_connector" "tunnel_warp_connector" {
+  account_id    = var.cloudflare_account_id
+  name          = "${var.prefix}-warp-tunnel-${random_string.oci-random.result}"
+  tunnel_secret = random_id.tunnel_secret.b64_std
+
+}
+
 resource "cloudflare_dns_record" "tunnel_dns_record" {
   count   = length(var.applist)
   zone_id = var.cloudflare_zone_id
