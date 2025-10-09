@@ -68,6 +68,14 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
         service  = "http://172.18.1.10:8443"
       },
       {
+        hostname = "radarr_${var.dns_domain}"
+        service  = "http://172.18.1.9:7878"
+      },
+      {
+        hostname = "sonarr_${var.dns_domain}"
+        service  = "http://172.18.1.8:8989"
+      },
+      {
         service = "http_status:404"
       }
     ]

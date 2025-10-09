@@ -332,6 +332,12 @@ variable "applist" {
       hostname = "prowlarr_"
     },
     {
+      hostname = "radarr_"
+    },
+    {
+      hostname = "sonarr_"
+    },
+    {
       hostname = "vscode_"
     } #,
     # {
