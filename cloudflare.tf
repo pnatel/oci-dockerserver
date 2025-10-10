@@ -105,6 +105,28 @@ resource "cloudflare_zero_trust_access_policy" "site_policy" {
   }]
 }
 
+# this allow vscode to run its scripts
+resource "cloudflare_ruleset" "allow_cloudflare_insights" {
+  name        = "Allow Cloudflare Insights in CSP"
+  description = "Adds static.cloudflareinsights.com to script-src"
+  kind        = "zone"
+  phase       = "http_response_headers_transform"
+  zone_id     = var.cloudflare_zone_id
+
+  rules = {
+    action = "set_header"
+    action_parameters = {
+      headers = {
+        name  = "Content-Security-Policy"
+        value = "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com"
+      }
+    }
+    enabled     = true
+    expression  = "true"
+    description = "Allow Cloudflare Insights script in CSP"
+  }
+}
+
 
 # # Creates a bypass rule to allow access to local applications to the Nextcloud app without authentication.
 
