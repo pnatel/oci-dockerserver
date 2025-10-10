@@ -105,6 +105,22 @@ resource "cloudflare_zero_trust_access_policy" "site_policy" {
   }]
 }
 
+resource "cloudflare_ruleset" "example_ruleset" {
+  zone_id     = "9f1839b6152d298aca64c4e906b6d074"
+  name        = "My ruleset"
+  phase       = "http_request_firewall_custom"
+  kind        = "root"
+  description = "A description for my ruleset."
+  rules = [
+    {
+      description = "Block the request."
+      expression  = "ip.src ne 1.1.1.1"
+      action      = "block"
+      ref         = "my_rule"
+    }
+  ]
+}
+
 # this allow vscode to run its scripts
 resource "cloudflare_ruleset" "allow_cloudflare_insights" {
   name        = "Allow Cloudflare Insights in CSP"
@@ -117,9 +133,11 @@ resource "cloudflare_ruleset" "allow_cloudflare_insights" {
     action = "set_header"
     action_parameters = {
       headers = {
-        name  = "Content-Security-Policy"
-        value = "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com"
-      }
+        name      = "Content-Security-Policy"
+        operation = "set"
+        value = {
+          value = "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com"
+        }      }
     }
     enabled     = true
     expression  = "true"
