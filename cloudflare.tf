@@ -113,7 +113,7 @@ resource "cloudflare_ruleset" "allow_cloudflare_insights" {
   phase       = "http_response_headers_transform"
   zone_id     = var.cloudflare_zone_id
 
-  rules = {
+  rules = [{
     action = "set_header"
     action_parameters = {
       headers = {
@@ -124,7 +124,7 @@ resource "cloudflare_ruleset" "allow_cloudflare_insights" {
     enabled     = true
     expression  = "true"
     description = "Allow Cloudflare Insights script in CSP"
-  }
+  }]
 }
 
 
