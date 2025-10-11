@@ -71,7 +71,8 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
         service  = "http://172.18.1.6:9696"
       },
       {
-        hostname = "vscode_${var.dns_domain}"
+        # hostname = "vscode_${var.dns_domain}"
+        hostname = "code-server"
         service  = "http://172.18.1.10:8443"
       },
       {
@@ -102,46 +103,6 @@ resource "cloudflare_zero_trust_access_policy" "site_policy" {
     email_domain = {
       domain = split("@", var.cloudflare_email)[1]
     }
-  }]
-}
-
-resource "cloudflare_ruleset" "example_ruleset" {
-  zone_id     = "9f1839b6152d298aca64c4e906b6d074"
-  name        = "My ruleset"
-  phase       = "http_request_firewall_custom"
-  kind        = "root"
-  description = "A description for my ruleset."
-  rules = [
-    {
-      description = "Block the request."
-      expression  = "ip.src ne 1.1.1.1"
-      action      = "block"
-      ref         = "my_rule"
-    }
-  ]
-}
-
-# this allow vscode to run its scripts
-resource "cloudflare_ruleset" "allow_cloudflare_insights" {
-  name        = "Allow Cloudflare Insights in CSP"
-  description = "Adds static.cloudflareinsights.com to script-src"
-  kind        = "zone"
-  phase       = "http_response_headers_transform"
-  zone_id     = var.cloudflare_zone_id
-
-  rules = [{
-    action = "set_header"
-    action_parameters = {
-      headers = {
-        name      = "Content-Security-Policy"
-        operation = "set"
-        value = {
-          value = "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com"
-        }      }
-    }
-    enabled     = true
-    expression  = "true"
-    description = "Allow Cloudflare Insights script in CSP"
   }]
 }
 
