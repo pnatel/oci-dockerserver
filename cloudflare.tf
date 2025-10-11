@@ -36,7 +36,7 @@ resource "cloudflare_dns_record" "tunnel_dns_record" {
 
 resource "cloudflare_dns_record" "tunnel_dns_record_code" {
   zone_id = var.cloudflare_zone_id
-  name    = "${var.applist[length(var.applist) - 1].hostname}"
+  name    = "${var.applist[length(var.applist) - 1].hostname}_"
   ttl     = 1
   type    = "CNAME"
   comment = "CNAME record that routes ${var.applist[length(var.applist) - 1].hostname} to the tunnel"
