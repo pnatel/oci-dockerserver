@@ -72,7 +72,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
       },
       {
         # hostname = "vscode_${var.dns_domain}"
-        hostname = "code-server"
+        hostname = "code-server${substr(var.dns_domain, 2, length(var.dns_domain) - 2)}"
         service  = "http://172.18.1.10:8443"
       },
       {
