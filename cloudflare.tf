@@ -16,12 +16,12 @@ resource "cloudflare_zero_trust_tunnel_cloudflared" "auto_tunnel" {
   tunnel_secret = random_id.tunnel_secret.b64_std
 }
 
-resource "cloudflare_zero_trust_tunnel_warp_connector" "tunnel_warp_connector" {
-  account_id    = var.cloudflare_account_id
-  name          = "${var.prefix}-warp-tunnel-${random_string.oci-random.result}"
-  tunnel_secret = random_id.tunnel_secret.b64_std
+# resource "cloudflare_zero_trust_tunnel_warp_connector" "tunnel_warp_connector" {
+#   account_id    = var.cloudflare_account_id
+#   name          = "${var.prefix}-warp-tunnel-${random_string.oci-random.result}"
+#   tunnel_secret = random_id.tunnel_secret.b64_std
 
-}
+# }
 
 resource "cloudflare_dns_record" "tunnel_dns_record" {
   count   = length(var.applist)
@@ -30,6 +30,16 @@ resource "cloudflare_dns_record" "tunnel_dns_record" {
   ttl     = 1
   type    = "CNAME"
   comment = "CNAME record that routes ${var.applist[count.index].hostname}${var.dns_domain} to the tunnel"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
+  proxied = true
+}
+
+resource "cloudflare_dns_record" "tunnel_dns_record_code" {
+  zone_id = var.cloudflare_zone_id
+  name    = "${var.applist[length(var.applist) - 1].hostname}"
+  ttl     = 1
+  type    = "CNAME"
+  comment = "CNAME record that routes ${var.applist[length(var.applist) - 1].hostname} to the tunnel"
   content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
   proxied = true
 }
@@ -48,6 +58,20 @@ resource "cloudflare_zero_trust_access_application" "access_app" {
     precedence = 1
   }]
 }
+
+resource "cloudflare_zero_trust_access_application" "access_app_code" {
+  zone_id                     = var.cloudflare_zone_id
+  allow_authenticate_via_warp = true
+  name                        = "Access application for ${var.applist[length(var.applist) - 1].hostname}"
+  domain                      = "${var.applist[length(var.applist) - 1].hostname}.${var.dns_domain[1.2]}"
+  type                        = "self_hosted"
+  session_duration            = "24h"
+  policies = [{
+    id         = cloudflare_zero_trust_access_policy.site_policy.id
+    precedence = 1
+  }]
+}
+
 
 # Creates the configuration for the tunnel.
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
@@ -71,7 +95,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
         service  = "http://172.18.1.6:9696"
       },
       {
-        hostname = "code_${var.dns_domain}"
+        hostname = "${var.applist[length(var.applist) - 1].hostname}.${var.dns_domain[1.2]}"
         service  = "http://172.18.1.10:8443"
       },
       {
