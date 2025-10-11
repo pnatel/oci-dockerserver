@@ -338,7 +338,7 @@ variable "applist" {
       hostname = "sonarr_"
     },
     {
-      hostname = "vscode_"
+      hostname = "code_"
     } #,
     # {
     #   hostname           = "plex"
