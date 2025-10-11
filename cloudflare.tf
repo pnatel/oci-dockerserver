@@ -103,7 +103,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
         service  = "http://172.18.1.8:8989"
       },
       {
-        hostname = "code-server_.${var.dns_domain}"
+        hostname = "code-server_${var.dns_domain}"
         service  = "http://172.18.1.10:8443"
       },
       {
