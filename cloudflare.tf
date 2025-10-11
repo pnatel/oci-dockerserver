@@ -24,7 +24,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared" "auto_tunnel" {
 # }
 
 resource "cloudflare_dns_record" "tunnel_dns_record" {
-  count   = length(var.applist)
+  count   = length(var.applist) - 1
   zone_id = var.cloudflare_zone_id
   name    = "${var.applist[count.index].hostname}${split(".", var.dns_domain)[0]}"
   ttl     = 1
@@ -36,7 +36,7 @@ resource "cloudflare_dns_record" "tunnel_dns_record" {
 
 resource "cloudflare_dns_record" "tunnel_dns_record_code" {
   zone_id = var.cloudflare_zone_id
-  name    = "${var.applist[length(var.applist) - 1].hostname}_${split(".", var.dns_domain)[0]}"
+  name    = "${var.applist[length(var.applist) - 1].hostname}"
   ttl     = 1
   type    = "CNAME"
   comment = "CNAME record that routes ${var.applist[length(var.applist) - 1].hostname} to the tunnel"
@@ -46,7 +46,7 @@ resource "cloudflare_dns_record" "tunnel_dns_record_code" {
 
 # Creates an Access application to control who can connect to Nextcloud.
 resource "cloudflare_zero_trust_access_application" "access_app" {
-  count                       = length(var.applist)
+  count                       = length(var.applist) - 1
   zone_id                     = var.cloudflare_zone_id
   allow_authenticate_via_warp = true
   name                        = "Access application for ${var.applist[count.index].hostname}${split(".", var.dns_domain)[0]}"
