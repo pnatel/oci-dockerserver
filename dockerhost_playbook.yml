@@ -227,6 +227,24 @@
       tags:
         - basicservices
 
+    - name: Portainer agent container (Docker Management)
+      community.docker.docker_container:
+        name: portainer_agent
+        hostname: portaineragent
+        image: portainer/agent:latest
+        ports:
+          - 9001:9001
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - /var/lib/docker/volumes:/var/lib/docker/volumes
+          - /:/host
+        pull: true
+        restart_policy: "always"
+        container_default_behavior: "compatibility"
+      no_log: true
+      tags:
+        - basicservices
+
     - name: watchtower container (automatic updates)
       community.docker.docker_container:
         name: watchtower
@@ -296,7 +314,7 @@
       no_log: true
       with_items:
         - "#!/bin/bash"
-        - "# install and configure onlyoffice connector"
+        - "# Replay Ansilbe playbook"
         - "# Change to directory"
         - "cd {{ project_directory }}/git/oci-dockerhost"
         - "# Ensure up-to-date"
