@@ -16,15 +16,15 @@ resource "cloudflare_zero_trust_tunnel_cloudflared" "auto_tunnel" {
   tunnel_secret = random_id.tunnel_secret.b64_std
 }
 
-resource "cloudflare_zero_trust_tunnel_warp_connector" "tunnel_warp_connector" {
-  account_id    = var.cloudflare_account_id
-  name          = "${var.prefix}-warp-tunnel-${random_string.oci-random.result}"
-  tunnel_secret = random_id.tunnel_secret.b64_std
+# resource "cloudflare_zero_trust_tunnel_warp_connector" "tunnel_warp_connector" {
+#   account_id    = var.cloudflare_account_id
+#   name          = "${var.prefix}-warp-tunnel-${random_string.oci-random.result}"
+#   tunnel_secret = random_id.tunnel_secret.b64_std
 
-}
+# }
 
 resource "cloudflare_dns_record" "tunnel_dns_record" {
-  count   = length(var.applist)
+  count   = length(var.applist) - 1
   zone_id = var.cloudflare_zone_id
   name    = "${var.applist[count.index].hostname}${split(".", var.dns_domain)[0]}"
   ttl     = 1
@@ -34,9 +34,19 @@ resource "cloudflare_dns_record" "tunnel_dns_record" {
   proxied = true
 }
 
+resource "cloudflare_dns_record" "tunnel_dns_record_code" {
+  zone_id = var.cloudflare_zone_id
+  name    = "${var.applist[length(var.applist) - 1].hostname}"
+  ttl     = 1
+  type    = "CNAME"
+  comment = "CNAME record that routes ${var.applist[length(var.applist) - 1].hostname} to the tunnel"
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
+  proxied = true
+}
+
 # Creates an Access application to control who can connect to Nextcloud.
 resource "cloudflare_zero_trust_access_application" "access_app" {
-  count                       = length(var.applist)
+  count                       = length(var.applist) - 1
   zone_id                     = var.cloudflare_zone_id
   allow_authenticate_via_warp = true
   name                        = "Access application for ${var.applist[count.index].hostname}${split(".", var.dns_domain)[0]}"
@@ -48,6 +58,20 @@ resource "cloudflare_zero_trust_access_application" "access_app" {
     precedence = 1
   }]
 }
+
+resource "cloudflare_zero_trust_access_application" "access_app_code" {
+  zone_id                     = var.cloudflare_zone_id
+  allow_authenticate_via_warp = true
+  name                        = "Access application for ${var.applist[length(var.applist) - 1].hostname}"
+  domain                      = "${var.applist[length(var.applist) - 1].hostname}.thecraftkeeper.com"
+  type                        = "self_hosted"
+  session_duration            = "24h"
+  policies = [{
+    id         = cloudflare_zero_trust_access_policy.site_policy.id
+    precedence = 1
+  }]
+}
+
 
 # Creates the configuration for the tunnel.
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
@@ -71,17 +95,20 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
         service  = "http://172.18.1.6:9696"
       },
       {
-        # hostname = "vscode_${var.dns_domain}"
-        hostname = "code-server${substr(var.dns_domain, 2, length(var.dns_domain) - 2)}"
-        service  = "http://172.18.1.10:8443"
-      },
-      {
         hostname = "radarr_${var.dns_domain}"
         service  = "http://172.18.1.9:7878"
       },
       {
         hostname = "sonarr_${var.dns_domain}"
         service  = "http://172.18.1.8:8989"
+      },
+      {
+        hostname = "code-server_${var.dns_domain}"
+        service  = "http://172.18.1.10:8443"
+      },
+      {
+        hostname = "${var.applist[length(var.applist) - 1].hostname}.thecraftkeeper.com"
+        service  = "http://172.18.1.10:8443"
       },
       {
         service = "http_status:404"
