@@ -88,7 +88,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
       },
       {
         hostname = "overseerr_${var.dns_domain}"
-        service  = "http://172.18.1.23:7777"
+        service  = "http://172.18.1.23:5055"
       },
       {
         hostname = "prowlarr_${var.dns_domain}"
