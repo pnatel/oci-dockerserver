@@ -88,19 +88,19 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
       },
       {
         hostname = "overseerr_${var.dns_domain}"
-        service  = "http://172.18.1.5:7777"
+        service  = "http://172.18.1.23:7777"
       },
       {
         hostname = "prowlarr_${var.dns_domain}"
-        service  = "http://172.18.1.6:9696"
+        service  = "http://172.18.1.22:9696"
       },
       {
         hostname = "radarr_${var.dns_domain}"
-        service  = "http://172.18.1.9:7878"
+        service  = "http://172.18.1.20:7878"
       },
       {
         hostname = "sonarr_${var.dns_domain}"
-        service  = "http://172.18.1.8:8989"
+        service  = "http://172.18.1.21:8989"
       },
       # {
       #   hostname = "code-server_${var.dns_domain}"
