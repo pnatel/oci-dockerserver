@@ -102,10 +102,10 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
         hostname = "sonarr_${var.dns_domain}"
         service  = "http://172.18.1.8:8989"
       },
-      {
-        hostname = "code-server_${var.dns_domain}"
-        service  = "http://172.18.1.10:8443"
-      },
+      # {
+      #   hostname = "code-server_${var.dns_domain}"
+      #   service  = "http://172.18.1.10:8443"
+      # },
       {
         hostname = "${var.applist[length(var.applist) - 1].hostname}.thecraftkeeper.com"
         service  = "http://172.18.1.10:8443"
