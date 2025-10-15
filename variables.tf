@@ -338,6 +338,9 @@ variable "applist" {
       hostname = "sonarr_"
     },
     {
+      hostname = "portal_"
+    },
+    {
       hostname = "code-server"
     } #,
     # {
