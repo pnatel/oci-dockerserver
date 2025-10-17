@@ -321,25 +321,34 @@ variable "applist" {
     # no_tls_verify      = optional(bool)
   }))
   default = [
+    # 0
     {
       hostname = "portainer_"
       #       service  = "https://${var.docker_portainer}:9443"
     },
+    # 1
+    # there is a static record for overseerr keep it as #1
     {
       hostname = "overseerr_"
     },
+    # 2
     {
       hostname = "prowlarr_"
     },
+    # 3
     {
       hostname = "radarr_"
     },
+    # 4
     {
       hostname = "sonarr_"
     },
+    # -2
+    # Keep the below as last items
     {
       hostname = "portal_"
     },
+    # -1
     {
       hostname = "code-server"
     } #,

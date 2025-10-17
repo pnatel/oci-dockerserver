@@ -34,13 +34,36 @@ resource "cloudflare_dns_record" "tunnel_dns_record" {
   proxied = true
 }
 
+# this resolves a bug with the name convention for code-server
 resource "cloudflare_dns_record" "tunnel_dns_record_code" {
   zone_id = var.cloudflare_zone_id
-  name    = "${var.applist[length(var.applist) - 1].hostname}"
+  name    = var.applist[length(var.applist) - 1].hostname
   ttl     = 1
   type    = "CNAME"
   comment = "CNAME record that routes ${var.applist[length(var.applist) - 1].hostname} to the tunnel"
   content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
+  proxied = true
+}
+
+# Portal redirection
+resource "cloudflare_dns_record" "tunnel_dns_record_portal" {
+  zone_id = var.cloudflare_zone_id
+  name    = "portal"
+  ttl     = 1
+  type    = "CNAME"
+  comment = "CNAME record that redirects portal to portal_"
+  content = "${var.applist[length(var.applist) - 2].hostname}${var.dns_domain}"
+  proxied = true
+}
+
+# PlexRequests redirection
+resource "cloudflare_dns_record" "tunnel_dns_record_plexrequests" {
+  zone_id = var.cloudflare_zone_id
+  name    = "plexrequests"
+  ttl     = 1
+  type    = "CNAME"
+  comment = "CNAME record that redirects portal to overseerr_"
+  content = "${var.applist[1].hostname}${var.dns_domain}"
   proxied = true
 }
 
