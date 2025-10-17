@@ -1,7 +1,5 @@
 # Local .terraform.lock.hcl files
 .terraform.lock.hcl
-*.lock.hcl
-*.hcl
 
 # Local .terraform directories
 .terraform/*
