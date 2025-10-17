@@ -77,19 +77,11 @@ resource "cloudflare_zero_trust_access_application" "access_app2" {
 
 # Creates the configuration for the tunnel.
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
-  count      = length(local.applist)
+  # count      = length(local.applist)
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id
   account_id = var.cloudflare_account_id
   config = {
-    ingress = [
-      {
-        hostname = "${local.applist[count.index].hostname}${var.dns_domain}"
-        service  = local.applist[count.index].service
-      },
-      {
-        service = "http_status:404"
-      }
-    ]
+    ingress = concat(local.applist, local.applist2, local.catchall)
     # READ ONLY LINKED WITH ERROR ON DEPLOYMENT
     # warp_routing = {
     #   enabled = true
@@ -97,27 +89,6 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
   }
 }
 
-resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel2" {
-  count      = length(local.applist2)
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id
-  account_id = var.cloudflare_account_id
-  config = {
-    ingress = [
-      {
-        hostname = "${local.applist2[count.index].hostname}.thecraftkeeper.com"
-        # hostname = "code-server.thecraftkeeper.com"
-        service = local.applist2[count.index].service
-      },
-      {
-        service = "http_status:404"
-      }
-    ]
-    # READ ONLY LINKED WITH ERROR ON DEPLOYMENT
-    # warp_routing = {
-    #   enabled = true
-    # }
-  }
-}
 
 # Creates an Access policy for the application.
 resource "cloudflare_zero_trust_access_policy" "site_policy" {
