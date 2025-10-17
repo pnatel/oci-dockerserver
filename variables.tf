@@ -313,49 +313,52 @@ variable "preserve_boot_volume" {
 #   default     = 2419200 # 4 weeks
 # }
 
-variable "applist" {
-  type = list(object({
-    hostname = string
-    # service            = string
-    # origin_server_name = optional(string)
-    # no_tls_verify      = optional(bool)
-  }))
-  default = [
-    # 0
+locals {
+  applist = [
     {
       hostname = "portainer_"
-      #       service  = "https://${var.docker_portainer}:9443"
+      service  = "https://${var.docker_portainer}:9443"
     },
-    # 1
-    # there is a static record for overseerr keep it as #1
     {
       hostname = "overseerr_"
+      service  = "http://172.18.1.23:5055"
     },
-    # 2
     {
       hostname = "prowlarr_"
+      service  = "http://172.18.1.22:9696"
     },
-    # 3
     {
       hostname = "radarr_"
+      service  = "http://172.18.1.20:7878"
     },
-    # 4
     {
       hostname = "sonarr_"
+      service  = "http://172.18.1.21:8989"
     },
-    # -2
-    # Keep the below as last items
     {
       hostname = "portal_"
-    },
-    # -1
-    {
-      hostname = "code-server"
-    } #,
+      service  = "http://172.18.1.30:3000"
+    }
     # {
     #   hostname           = "plex"
     #   service            = "https://192.168.86.4:32400"
     #   origin_server_name = "*.0dad5e2b20ec42af9db1ec6f3a1693dc.plex.direct"
     # }
+    #]
+  ]
+  # Those are subdomains that don't share the subdomain suffix
+  applist2 = [
+    {
+      hostname = "portal"
+      service  = "http://172.18.1.30:3000"
+    },
+    {
+      hostname = "plexrequests"
+      service  = "http://172.18.1.23:5055"
+    },
+    {
+      hostname = "code-server"
+      service  = "http://172.18.1.10:8443"
+    }
   ]
 }

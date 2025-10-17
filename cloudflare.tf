@@ -24,56 +24,35 @@ resource "cloudflare_zero_trust_tunnel_cloudflared" "auto_tunnel" {
 # }
 
 resource "cloudflare_dns_record" "tunnel_dns_record" {
-  count   = length(var.applist) - 1
+  count   = length(local.applist)
   zone_id = var.cloudflare_zone_id
-  name    = "${var.applist[count.index].hostname}${split(".", var.dns_domain)[0]}"
+  name    = "${local.applist[count.index].hostname}${split(".", var.dns_domain)[0]}"
   ttl     = 1
   type    = "CNAME"
-  comment = "CNAME record that routes ${var.applist[count.index].hostname}${var.dns_domain} to the tunnel"
+  comment = "CNAME record that routes ${local.applist[count.index].hostname}${var.dns_domain} to the tunnel"
   content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
   proxied = true
 }
 
 # this resolves a bug with the name convention for code-server
-resource "cloudflare_dns_record" "tunnel_dns_record_code" {
+resource "cloudflare_dns_record" "tunnel_dns_record2" {
+  count   = length(local.applist2)
   zone_id = var.cloudflare_zone_id
-  name    = var.applist[length(var.applist) - 1].hostname
+  name    = local.applist2[count.index].hostname
   ttl     = 1
   type    = "CNAME"
-  comment = "CNAME record that routes ${var.applist[length(var.applist) - 1].hostname} to the tunnel"
+  comment = "CNAME record that routes ${local.applist2[count.index].hostname} to the tunnel"
   content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
-  proxied = true
-}
-
-# Portal redirection
-resource "cloudflare_dns_record" "tunnel_dns_record_portal" {
-  zone_id = var.cloudflare_zone_id
-  name    = "portal"
-  ttl     = 1
-  type    = "CNAME"
-  comment = "CNAME record that redirects portal to portal_"
-  content = "${var.applist[length(var.applist) - 2].hostname}${var.dns_domain}"
-  proxied = true
-}
-
-# PlexRequests redirection
-resource "cloudflare_dns_record" "tunnel_dns_record_plexrequests" {
-  zone_id = var.cloudflare_zone_id
-  name    = "plexrequests"
-  ttl     = 1
-  type    = "CNAME"
-  comment = "CNAME record that redirects portal to overseerr_"
-  content = "${var.applist[1].hostname}${var.dns_domain}"
   proxied = true
 }
 
 # Creates an Access application to control who can connect to Nextcloud.
 resource "cloudflare_zero_trust_access_application" "access_app" {
-  count                       = length(var.applist) - 1
+  count                       = length(local.applist)
   zone_id                     = var.cloudflare_zone_id
   allow_authenticate_via_warp = true
-  name                        = "Access application for ${var.applist[count.index].hostname}${split(".", var.dns_domain)[0]}"
-  domain                      = "${var.applist[count.index].hostname}${var.dns_domain}"
+  name                        = "Access application for ${local.applist[count.index].hostname}${split(".", var.dns_domain)[0]}"
+  domain                      = "${local.applist[count.index].hostname}${var.dns_domain}"
   type                        = "self_hosted"
   session_duration            = "24h"
   policies = [{
@@ -82,11 +61,12 @@ resource "cloudflare_zero_trust_access_application" "access_app" {
   }]
 }
 
-resource "cloudflare_zero_trust_access_application" "access_app_code" {
+resource "cloudflare_zero_trust_access_application" "access_app2" {
+  count                       = length(local.applist2)
   zone_id                     = var.cloudflare_zone_id
   allow_authenticate_via_warp = true
-  name                        = "Access application for ${var.applist[length(var.applist) - 1].hostname}"
-  domain                      = "${var.applist[length(var.applist) - 1].hostname}.thecraftkeeper.com"
+  name                        = "Access application for ${local.applist2[count.index].hostname}"
+  domain                      = "${local.applist2[count.index].hostname}.thecraftkeeper.com"
   type                        = "self_hosted"
   session_duration            = "24h"
   policies = [{
@@ -94,45 +74,39 @@ resource "cloudflare_zero_trust_access_application" "access_app_code" {
     precedence = 1
   }]
 }
-
 
 # Creates the configuration for the tunnel.
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
+  count      = length(local.applist)
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id
   account_id = var.cloudflare_account_id
   config = {
     ingress = [
       {
-        hostname = "portainer_${var.dns_domain}"
-        service  = "https://${var.docker_portainer}:9443"
-        origin_request = {
-          no_tls_verify = true
-        }
+        hostname = "${local.applist[count.index].hostname}${var.dns_domain}"
+        service  = local.applist[count.index].service
       },
       {
-        hostname = "overseerr_${var.dns_domain}"
-        service  = "http://172.18.1.23:5055"
-      },
+        service = "http_status:404"
+      }
+    ]
+    # READ ONLY LINKED WITH ERROR ON DEPLOYMENT
+    # warp_routing = {
+    #   enabled = true
+    # }
+  }
+}
+
+resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel2" {
+  count      = length(local.applist2)
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id
+  account_id = var.cloudflare_account_id
+  config = {
+    ingress = [
       {
-        hostname = "prowlarr_${var.dns_domain}"
-        service  = "http://172.18.1.22:9696"
-      },
-      {
-        hostname = "radarr_${var.dns_domain}"
-        service  = "http://172.18.1.20:7878"
-      },
-      {
-        hostname = "sonarr_${var.dns_domain}"
-        service  = "http://172.18.1.21:8989"
-      },
-      {
-        hostname = "portal_${var.dns_domain}"
-        service  = "http://172.18.1.30:3000"
-      },
-      {
-        # hostname = "${var.applist[length(var.applist) - 1].hostname}.thecraftkeeper.com"
-        hostname = "code-server.thecraftkeeper.com"
-        service  = "http://172.18.1.10:8443"
+        hostname = "${local.applist2[count.index].hostname}.thecraftkeeper.com"
+        # hostname = "code-server.thecraftkeeper.com"
+        service = local.applist2[count.index].service
       },
       {
         service = "http_status:404"
