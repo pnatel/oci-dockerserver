@@ -29,15 +29,15 @@ locals {
       service  = "http://172.18.1.30:3000"
     },
     {
-      hostname = "portal${join(".", slice(split(".", var.dns_domain), 1, 3))}"
+      hostname = "portal.${join(".", slice(split(".", var.dns_domain), 1, 3))}"
       service  = "http://172.18.1.30:3000"
     },
     {
-      hostname = "plexrequests${join(".", slice(split(".", var.dns_domain), 1, 3))}"
+      hostname = "plexrequests.${join(".", slice(split(".", var.dns_domain), 1, 3))}"
       service  = "http://172.18.1.23:5055"
     },
     {
-      hostname = "code-server${join(".", slice(split(".", var.dns_domain), 1, 3))}"
+      hostname = "code-server.${join(".", slice(split(".", var.dns_domain), 1, 3))}"
       service  = "http://172.18.1.10:8443"
     }
   ]
