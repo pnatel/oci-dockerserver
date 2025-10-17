@@ -26,22 +26,10 @@ resource "cloudflare_zero_trust_tunnel_cloudflared" "auto_tunnel" {
 resource "cloudflare_dns_record" "tunnel_dns_record" {
   count   = length(local.applist)
   zone_id = var.cloudflare_zone_id
-  name    = "${local.applist[count.index].hostname}${split(".", var.dns_domain)[0]}"
+  name    = split(".", local.applist[count.index].hostname)[0]
   ttl     = 1
   type    = "CNAME"
-  comment = "CNAME record that routes ${local.applist[count.index].hostname}${var.dns_domain} to the tunnel"
-  content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
-  proxied = true
-}
-
-# this resolves a bug with the name convention for code-server
-resource "cloudflare_dns_record" "tunnel_dns_record2" {
-  count   = length(local.applist2)
-  zone_id = var.cloudflare_zone_id
-  name    = local.applist2[count.index].hostname
-  ttl     = 1
-  type    = "CNAME"
-  comment = "CNAME record that routes ${local.applist2[count.index].hostname} to the tunnel"
+  comment = "CNAME record that routes ${local.applist[count.index].hostname} to the tunnel"
   content = "${cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id}.cfargotunnel.com"
   proxied = true
 }
@@ -51,22 +39,8 @@ resource "cloudflare_zero_trust_access_application" "access_app" {
   count                       = length(local.applist)
   zone_id                     = var.cloudflare_zone_id
   allow_authenticate_via_warp = true
-  name                        = "Access application for ${local.applist[count.index].hostname}${split(".", var.dns_domain)[0]}"
-  domain                      = "${local.applist[count.index].hostname}${var.dns_domain}"
-  type                        = "self_hosted"
-  session_duration            = "24h"
-  policies = [{
-    id         = cloudflare_zero_trust_access_policy.site_policy.id
-    precedence = 1
-  }]
-}
-
-resource "cloudflare_zero_trust_access_application" "access_app2" {
-  count                       = length(local.applist2)
-  zone_id                     = var.cloudflare_zone_id
-  allow_authenticate_via_warp = true
-  name                        = "Access application for ${local.applist2[count.index].hostname}"
-  domain                      = "${local.applist2[count.index].hostname}.thecraftkeeper.com"
+  name                        = "Access application for ${split(".", local.applist[count.index].hostname)[0]}"
+  domain                      = local.applist[count.index].hostname
   type                        = "self_hosted"
   session_duration            = "24h"
   policies = [{
@@ -81,7 +55,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "auto_tunnel" {
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.auto_tunnel.id
   account_id = var.cloudflare_account_id
   config = {
-    ingress = concat(local.applist, local.applist2, local.catchall)
+    ingress = concat(local.applist, local.catchall)
     # READ ONLY LINKED WITH ERROR ON DEPLOYMENT
     # warp_routing = {
     #   enabled = true
