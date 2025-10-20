@@ -42,7 +42,7 @@ locals {
     },
     {
       hostname = "librephotos_${var.dns_domain}"
-      service = "http://172.18.1.40:30000"
+      service = "http://172.18.1.40"
     }
   ]
   catchall = [
