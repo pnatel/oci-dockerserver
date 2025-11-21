@@ -17,8 +17,8 @@ terraform {
       source = "oracle/oci"
     }
     cloudflare = {
-      source = "cloudflare/cloudflare"
-      # version = "4.45.0"
+      source  = "cloudflare/cloudflare"
+      version = ">= 5.13.0"
     }
     random = {
       source = "hashicorp/random"
@@ -27,7 +27,7 @@ terraform {
     #   source = "hashicorp/hcp"
     # }
   }
-  required_version = ">= 1.10.0"
+  required_version = ">= 1.14.0"
 }
 
 # Providers

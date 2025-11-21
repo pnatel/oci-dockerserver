@@ -58,7 +58,7 @@
       when:
         - ansible_swaptotal_mb < 1
 
-    - name: Required packages
+    - name: APT Required packages
       ansible.builtin.apt:
         pkg:
           - docker.io
@@ -68,6 +68,13 @@
           - docker-compose
         state: latest
         update_cache: true
+
+    # Install a snap with classic confinement
+    # sudo snap install oracle-cloud-agent --classic
+    - name: Install "oracle-cloud-agent" with option --classic
+      snap:
+        name: oracle-cloud-agent
+        classic: yes
 
     - name: Docker python packages
       ansible.builtin.pip:
