@@ -41,12 +41,14 @@ locals {
       service  = "http://172.18.1.10:8443"
     },
     {
-      hostname = "immich_${var.dns_domain}"
-      service  = "http://172.18.1.51:2283"
-    },
-    {
       hostname = "librephotos_${var.dns_domain}"
       service = "http://172.18.1.40"
+    },
+    # ---------public facing apps----------
+    # immich
+    {
+      hostname = "photos.${join(".", slice(split(".", var.dns_domain), 1, 3))}"
+      service  = "http://172.18.1.51:2283"
     }
   ]
   catchall = [
