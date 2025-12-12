@@ -66,8 +66,29 @@
           - python3-pip
           # - ssl-cert
           - docker-compose-v2
+          - fuse3
         state: latest
         update_cache: true
+
+    # NEED TO REWRITE THIS
+    # FOLDERS SHOULD ONLY BE CREATED IF NOT AVAILABLE
+    # SHOULD I INSTALL RCLONE LOCALLY TO GENERATE THE CONFIG FILES?
+    # - name: Install Docker Plugin rclone
+    #   ansible.builtin.shell: |
+    #     sudo mkdir -p /var/lib/docker-plugins/rclone/config
+    #     sudo mkdir -p /var/lib/docker-plugins/rclone/cache
+    #     docker plugin install rclone/docker-volume-rclone:amd64 args="-v" --alias rclone --grant-all-permissions
+    #   args:
+    #     executable: /bin/bash
+    #   tags:
+    #     - basicservices
+  
+# ------------
+# NEED TO COMPLETE THE PLUGIN CONFIG AS PER:
+# https://www.selfhosted.club/posts/s3-backed-docker-volumes/
+# HOW TO PASS THE CONFIG? THERE IS LOTS OF SENSITIVE DATA
+# -------------
+
 
     # Install a snap with classic confinement
     # sudo snap install oracle-cloud-agent --classic
