@@ -42,21 +42,21 @@ locals {
     },
     {
       hostname = "librephotos_${var.dns_domain}"
-      service = "http://172.18.1.40"
+      service  = "http://172.18.1.40"
     },
     {
       hostname = "ebooks-${var.dns_domain}"
-      service = "http://172.18.1.33"
+      service  = "http://172.18.1.33"
     },
     {
       hostname = "ebooks-requests-${var.dns_domain}"
-      service = "http://172.18.1.34"
-    # },
-    # # ---------public facing apps----------
-    # # immich
-    # {
-    #   hostname = "photos.${join(".", slice(split(".", var.dns_domain), 1, 3))}"
-    #   service  = "http://172.18.1.51:2283"
+      service  = "http://172.18.1.34"
+      # },
+      # # ---------public facing apps----------
+      # # immich
+      # {
+      #   hostname = "photos.${join(".", slice(split(".", var.dns_domain), 1, 3))}"
+      #   service  = "http://172.18.1.51:2283"
     }
   ]
   catchall = [

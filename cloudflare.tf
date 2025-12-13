@@ -36,7 +36,7 @@ resource "cloudflare_dns_record" "tunnel_dns_record" {
 
 # Creates an Access application to control who can connect to Nextcloud.
 resource "cloudflare_zero_trust_access_application" "access_app" {
-  count                       = length(local.applist)  # - 1  # the final application(s) are public
+  count                       = length(local.applist) # - 1  # the final application(s) are public
   zone_id                     = var.cloudflare_zone_id
   allow_authenticate_via_warp = true
   name                        = "Access application for ${split(".", local.applist[count.index].hostname)[0]}"
