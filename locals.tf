@@ -62,7 +62,7 @@ locals {
     },
     {
       hostname = "pdf-${var.dns_domain}"
-      service = "http://172.18.1.50:3001"
+      service = "http://172.18.1.50:8080"  # (Container IP uses internal port)
     }
       # # ---------public facing apps----------
       # # immich
