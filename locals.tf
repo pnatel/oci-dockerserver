@@ -46,11 +46,11 @@ locals {
     },
     {
       hostname = "ebooks-${var.dns_domain}"
-      service  = "http://172.18.1.33"
+      service  = "http://172.18.1.33:8083"
     },
     {
       hostname = "ebooks-requests-${var.dns_domain}"
-      service  = "http://172.18.1.34"
+      service  = "http://172.18.1.34:8084"
       # },
       # # ---------public facing apps----------
       # # immich
