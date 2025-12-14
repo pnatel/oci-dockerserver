@@ -59,6 +59,10 @@ locals {
     {
       hostname = "downloader-s3-${var.dns_domain}"
       service = "http://172.18.1.24:8088"
+    },
+    {
+      hostname = "pdf-${var.dns_domain}"
+      service = "http://172.18.1.50:3001"
     }
       # # ---------public facing apps----------
       # # immich
