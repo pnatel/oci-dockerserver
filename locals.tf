@@ -46,7 +46,7 @@ locals {
     },
     {
       hostname = "ebooks-${var.dns_domain}"
-      service  = "http://172.18.1.33:8083"
+      service  = "http://172.18.1.32:8083"
     },
     {
       hostname = "ebooks-requests-${var.dns_domain}"
