@@ -252,6 +252,7 @@ variable "OBJECTSTORE_S3_HOSTNAME" {
   type        = string
   description = "S3 hostname (endpoint URL) to access the S3 account"
 }
+
 # variable "NEXTCLOUD_TRUSTED_DOMAINS" {
 #   type        = string
 #   description = "Extra domains eg: 'domain.com sub.domain.org' "
