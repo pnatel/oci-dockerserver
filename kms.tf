@@ -107,17 +107,17 @@ resource "oci_kms_key" "oci-kms-disk-key" {
 #   }
 # }
 
-# resource "oci_vault_secret" "oci-bucker-user-key-secret" {
-#   compartment_id = oci_identity_compartment.oci-compartment.id
-#   vault_id       = oci_kms_vault.oci-kms-vault.id
-#   key_id         = oci_kms_key.oci-kms-storage-key.id
-#   secret_name    = "oci-bucker-user-key-secret"
-#   description    = "Secret used in the OCI buckets"
-#   secret_content {
-#     content_type = "BASE64"
-#     content      = base64encode(oci_identity_customer_secret_key.oci-bucker-user-key.key)
-#   }
-# }
+resource "oci_vault_secret" "oci-bucket-user-key-secret" {
+  compartment_id = oci_identity_compartment.oci-compartment.id
+  vault_id       = oci_kms_vault.oci-kms-vault.id
+  key_id         = oci_kms_key.oci-kms-storage-key.id
+  secret_name    = "oci-bucket-user-key-secret"
+  description    = "Secret used in the OCI buckets"
+  secret_content {
+    content_type = "BASE64"
+    content      = base64encode(oci_identity_customer_secret_key.oci-bucket-user-key.key)
+  }
+}
 
 # resource "oci_vault_secret" "jwt_monitoring" {
 #   compartment_id = oci_identity_compartment.oci-compartment.id
@@ -160,12 +160,12 @@ resource "oci_kms_key" "oci-kms-disk-key" {
 #   plaintext = oci_vault_secret.oo_password.secret_content.0.content
 # }
 
-# resource "oci_kms_encrypted_data" "oci-kms-bucket-user-key-secret" {
-#   crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
-#   key_id          = oci_kms_key.oci-kms-storage-key.id
-#   # plaintext       = base64encode(oci_identity_customer_secret_key.oci-bucker-user-key.key)
-#   plaintext = oci_vault_secret.oci-bucker-user-key-secret.secret_content.0.content
-# }
+resource "oci_kms_encrypted_data" "oci-kms-bucket-user-key-secret" {
+  crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
+  key_id          = oci_kms_key.oci-kms-storage-key.id
+  # plaintext       = base64encode(oci_identity_customer_secret_key.oci-bucket-user-key.key)
+  plaintext = oci_vault_secret.oci-bucket-user-key-secret.secret_content.0.content
+}
 
 # resource "oci_kms_encrypted_data" "oci-kms-jwt-monitoring-secret" {
 #   crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
@@ -180,17 +180,17 @@ resource "oci_kms_key" "oci-kms-disk-key" {
 #   plaintext       = base64encode(var.SMTP_PASSWORD)
 # }
 
-# resource "oci_kms_encrypted_data" "oci-kms-ext-s3-key-secret" {
-#   crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
-#   key_id          = oci_kms_key.oci-kms-storage-key.id
-#   plaintext       = base64encode(var.OBJECTSTORE_S3_KEY)
-# }
+resource "oci_kms_encrypted_data" "oci-kms-ext-s3-key-secret" {
+  crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
+  key_id          = oci_kms_key.oci-kms-storage-key.id
+  plaintext       = base64encode(var.OBJECTSTORE_S3_KEY)
+}
 
-# resource "oci_kms_encrypted_data" "oci-kms-ext-s3-secret-secret" {
-#   crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
-#   key_id          = oci_kms_key.oci-kms-storage-key.id
-#   plaintext       = base64encode(var.OBJECTSTORE_S3_SECRET)
-# }
+resource "oci_kms_encrypted_data" "oci-kms-ext-s3-secret-secret" {
+  crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
+  key_id          = oci_kms_key.oci-kms-storage-key.id
+  plaintext       = base64encode(var.OBJECTSTORE_S3_SECRET)
+}
 
 resource "oci_kms_encrypted_data" "kms-zerotier-ntwk-secret" {
   crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint

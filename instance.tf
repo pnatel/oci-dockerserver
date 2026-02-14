@@ -54,6 +54,16 @@ resource "oci_core_instance" "oci-instance" {
         oci_kms_endpoint         = oci_kms_vault.oci-kms-vault.crypto_endpoint
         oci_kms_keyid            = oci_kms_key.oci-kms-storage-key.id
         dns_token                = data.cloudflare_zero_trust_tunnel_cloudflared_token.tunnel_cloudflared_token.token
+        bucket_user_key_cipher = oci_kms_encrypted_data.oci-kms-bucket-user-key-secret.ciphertext
+        bucket_user_id         = oci_identity_customer_secret_key.oci-bucket-user-key.id
+        oci_kms_endpoint       = oci_kms_vault.oci-kms-vault.crypto_endpoint
+        oci_kms_keyid          = oci_kms_key.oci-kms-storage-key.id
+        oci_storage_namespace  = data.oci_objectstorage_namespace.oci-bucket-namespace.namespace
+        oci_storage_bucketname = "${var.prefix}-bucket"
+        objectstore_s3_key_cipher    = oci_kms_encrypted_data.oci-kms-ext-s3-key-secret.ciphertext
+        objectstore_s3_secret_cipher = oci_kms_encrypted_data.oci-kms-ext-s3-secret-secret.ciphertext
+        objectstore_s3_region            = var.OBJECTSTORE_S3_REGION
+        objectstore_s3_hostname            = var.OBJECTSTORE_S3_HOSTNAME
         # -------optional----------
         github_cipher         = oci_kms_encrypted_data.kms-ext-github-secret.ciphertext
         zerotier_ntwk_cipher  = oci_kms_encrypted_data.kms-zerotier-ntwk-secret.ciphertext

@@ -180,7 +180,7 @@ variable "docker_watchtower" {
 variable "project_directory" {
   type        = string
   description = "Location to install/run project"
-  default     = "/docker"
+  default     = "/opt"
 }
 
 # variable "web_port" {
@@ -233,25 +233,25 @@ variable "dns_domain" {
 #   type = string
 # }
 
-# variable "OBJECTSTORE_S3_KEY" {
-#   type        = string
-#   description = "S3 key to access the S3 account"
-# }
+variable "OBJECTSTORE_S3_KEY" {
+  type        = string
+  description = "S3 key to access the S3 account"
+}
 
-# variable "OBJECTSTORE_S3_SECRET" {
-#   type        = string
-#   description = "S3 secret to access the S3 account"
-# }
+variable "OBJECTSTORE_S3_SECRET" {
+  type        = string
+  description = "S3 secret to access the S3 account"
+}
 
-# variable "OBJECTSTORE_S3_REGION" {
-#   type        = string
-#   description = "S3 region to access the S3 account"
-# }
+variable "OBJECTSTORE_S3_REGION" {
+  type        = string
+  description = "S3 region to access the S3 account"
+}
 
-# variable "OBJECTSTORE_S3_HOSTNAME" {
-#   type        = string
-#   description = "S3 hostname (endpoint URL) to access the S3 account"
-# }
+variable "OBJECTSTORE_S3_HOSTNAME" {
+  type        = string
+  description = "S3 hostname (endpoint URL) to access the S3 account"
+}
 # variable "NEXTCLOUD_TRUSTED_DOMAINS" {
 #   type        = string
 #   description = "Extra domains eg: 'domain.com sub.domain.org' "
