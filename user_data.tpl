@@ -46,6 +46,11 @@ zerotier_ntwk_cipher: ${zerotier_ntwk_cipher}
 zerotier_token_cipher: ${zerotier_token_cipher}
 github_cipher: ${github_cipher}
 dns_token: ${dns_token}
+oci_kms_endpoint: ${oci_kms_endpoint} 
+oci_kms_keyid: ${oci_kms_keyid} 
+oci_storage_namespace: ${oci_storage_namespace} 
+oci_storage_bucketname: ${oci_storage_bucketname} 
+oci_region: ${oci_region} 
 objectstore_s3_key_cipher: ${objectstore_s3_key_cipher}
 objectstore_s3_secret_cipher: ${objectstore_s3_secret_cipher}
 objectstore_s3_region: ${objectstore_s3_region}
