@@ -230,7 +230,7 @@
         aws_secret_key: '{{ OBJECTSTORE_S3_SECRET_decrypt.decrypted_data.plaintext | b64decode | trim }}'
         endpoint_url: 'https://{{ objectstore_s3_hostname }}'
         region: '{{ objectstore_s3_region }}' 
-        name: '{{ objectstore_s3_bucketname }}' 
+        bucket: '{{ objectstore_s3_bucketname }}' 
         mode: get
         object: "mount_backup.tar.gz"
         dest: "{{ project_directory }}/mount_backup.tar.gz"
@@ -458,7 +458,7 @@
         - "        aws_secret_key: \"{{ OBJECTSTORE_S3_SECRET_decrypt.decrypted_data.plaintext | b64decode | trim }}\""
         - "        endpoint_url: \"https://{{ objectstore_s3_hostname }}\""
         - "        region: \"{{ objectstore_s3_region }}\""
-        - "        name: \"{{ objectstore_s3_bucketname }}\""
+        - "        bucket: \"{{ objectstore_s3_bucketname }}\""
         - "        object: \"{{ '{{ item }}' }}_backup.tar.gz\""
         - "        src: \"{{ project_directory }}/{{ '{{ item }}' }}_backup.tar.gz\""
         - "        mode: put"
