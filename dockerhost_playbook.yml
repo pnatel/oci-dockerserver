@@ -163,7 +163,8 @@
         plugin_name: rclone/docker-volume-rclone:latest
         alias: rclone
         state: present
-        grant_all_permissions: true
+        install_options:
+          grant_all_permissions: true
         plugin_options:
           args: "-v"
 
