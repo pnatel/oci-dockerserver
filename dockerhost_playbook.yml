@@ -164,6 +164,7 @@
         alias: rclone
         args: "-v"
         grant_all_permissions: true
+        plugin_name: rclone
         state: present
 
     - name: Enable Docker Rclone Plugin
