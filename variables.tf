@@ -180,7 +180,7 @@ variable "docker_watchtower" {
 variable "project_directory" {
   type        = string
   description = "Location to install/run project"
-  default     = "/docker"
+  default     = "/opt"
 }
 
 # variable "web_port" {
