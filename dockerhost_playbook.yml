@@ -160,7 +160,7 @@
 
     - name: Install Rclone Docker plugin
       community.docker.docker_plugin:
-        plugin_name: rclone/docker-volume-rclone:latest
+        plugin_name: rclone/docker-volume-rclone:arm64
         alias: rclone
         state: enable
         plugin_options:
