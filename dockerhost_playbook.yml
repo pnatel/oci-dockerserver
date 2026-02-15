@@ -11,7 +11,7 @@
 
     - name: Capture start time
       set_fact:
-        start_time: "{{ ansible_date_time.iso8601 }}"
+        start_time: "{{ ansible_facts['date_time']['iso8601'] }}"
 
     - name: Display start time
       debug:
@@ -28,7 +28,7 @@
         mkswap /"{{ project_directory }}"/swap.file
       when:
         - not swap_file.stat.exists
-        - ansible_swaptotal_mb < 1
+        - ansible_facts["swaptotal_mb"] < 1
 
     - name: Set swap file permissions
       ansible.builtin.file:
@@ -38,7 +38,7 @@
         group: root
         mode: '0600'
       when:
-        - ansible_swaptotal_mb < 1
+        - ansible_facts["swaptotal_mb"] < 1
 
     - name: Set swap mount
       ansible.posix.mount:
@@ -50,13 +50,13 @@
         dump: '0'
         state: present
       when:
-        - ansible_swaptotal_mb < 1
+        - ansible_facts["swaptotal_mb"] < 1
 
     - name: Mount swap now
       ansible.builtin.shell: |
         swapon /"{{ project_directory }}"/swap.file
       when:
-        - ansible_swaptotal_mb < 1
+        - ansible_facts["swaptotal_mb"] < 1
 
     - name: APT Required packages
       ansible.builtin.apt:
