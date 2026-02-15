@@ -158,14 +158,14 @@
         path: /var/lib/docker-plugins/rclone/cache
         state: absent
 
-    - name: Install Docker Rclone Plugin
+    - name: Install Rclone Docker plugin
       community.docker.docker_plugin:
-        name: rclone/docker-volume-rclone:amd64
+        plugin_name: rclone/docker-volume-rclone:latest
         alias: rclone
-        args: "-v"
-        grant_all_permissions: true
-        plugin_name: rclone
         state: present
+        grant_all_permissions: true
+        plugin_options:
+          args: "-v"
 
     - name: Enable Docker Rclone Plugin
       community.docker.docker_plugin:
@@ -420,9 +420,6 @@
         - "git pull"
         - "# Execute playbook"
         - "ansible-playbook dockerhost_playbook.yml --extra-vars '@{{ project_directory }}/dockerhost-vars.yaml'"
-    - name: Capture end time
-      set_fact:
-        end_time: "{{ ansible_date_time.iso8601 }}"
 
 # -----Backup---------
     - name: mount backup playbook (clear)
@@ -527,6 +524,9 @@
         - mount-backup.timer
         - mount-backup.service
 # --------------------------------
+    - name: Capture end time
+      set_fact:
+        end_time: "{{ ansible_facts['date_time']['iso8601'] }}"
 
     - name: Display end time
       debug:
