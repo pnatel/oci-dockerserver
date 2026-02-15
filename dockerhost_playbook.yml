@@ -230,12 +230,13 @@
       register: zerotier_state
 
     - name: Get backup from storage if exists
-      amazon.aws.s3:
+      amazon.aws.s3_object:
         aws_access_key: '{{ OBJECTSTORE_S3_KEY_decrypt.decrypted_data.plaintext | b64decode | trim }}'
         aws_secret_key: '{{ OBJECTSTORE_S3_SECRET_decrypt.decrypted_data.plaintext | b64decode | trim }}'
         endpoint_url: 'https://{{ objectstore_s3_hostname }}'
         region: '{{ objectstore_s3_region }}' 
         name: '{{ objectstore_s3_bucketname }}' 
+        mode: get
         object: "mount_backup.tar.gz"
         dest: "{{ project_directory }}/mount_backup.tar.gz"
       when: not zerotier_state.stat.exists
@@ -459,14 +460,15 @@
         - "        - mount"
         - "   "
         - "    - name: Upload mount archive to storage"
-        - "      amazon.aws.s3:"
+        - "      amazon.aws.s3_object:"
         - "        aws_access_key: \"{{ OBJECTSTORE_S3_KEY_decrypt.decrypted_data.plaintext | b64decode | trim }}\""
         - "        aws_secret_key: \"{{ OBJECTSTORE_S3_SECRET_decrypt.decrypted_data.plaintext | b64decode | trim }}\""
         - "        endpoint_url: \"https://{{ objectstore_s3_hostname }}\""
         - "        region: \"{{ objectstore_s3_region }}\""
         - "        name: \"{{ objectstore_s3_bucketname }}\""
-        - "        object_name: \"{{ '{{ item }}' }}_backup.tar.gz\""
+        - "        object: \"{{ '{{ item }}' }}_backup.tar.gz\""
         - "        src: \"{{ project_directory }}/{{ '{{ item }}' }}_backup.tar.gz\""
+        - "        mode: put"
         - "      with_items: "
         - "        - mount "
         - "   "
