@@ -124,6 +124,11 @@
 # ------------Docker Rclone Plugin Configuration---------
     # Adapted from https://rclone.org/docker/
     # and https://www.selfhosted.club/posts/s3-backed-docker-volumes/
+    - name: Clear rclone cache directory
+      ansible.builtin.file:
+        path: /var/lib/docker-plugins/rclone/cache
+        state: absent
+
     - name: Create rclone plugin directories
       ansible.builtin.file:
         path: "{{ item }}"
@@ -152,11 +157,6 @@
         owner: root
         group: root
         mode: '0600'
-
-    - name: Clear rclone cache directory
-      ansible.builtin.file:
-        path: /var/lib/docker-plugins/rclone/cache
-        state: absent
 
     - name: Install Rclone Docker plugin
       community.docker.docker_plugin:
