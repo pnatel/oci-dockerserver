@@ -107,15 +107,15 @@ resource "oci_kms_key" "oci-kms-disk-key" {
 #   }
 # }
 
-# resource "oci_vault_secret" "oci-bucker-user-key-secret" {
+# resource "oci_vault_secret" "oci-bucket-user-key-secret" {
 #   compartment_id = oci_identity_compartment.oci-compartment.id
 #   vault_id       = oci_kms_vault.oci-kms-vault.id
 #   key_id         = oci_kms_key.oci-kms-storage-key.id
-#   secret_name    = "oci-bucker-user-key-secret"
+#   secret_name    = "oci-bucket-user-key-secret"
 #   description    = "Secret used in the OCI buckets"
 #   secret_content {
 #     content_type = "BASE64"
-#     content      = base64encode(oci_identity_customer_secret_key.oci-bucker-user-key.key)
+#     content      = base64encode(oci_identity_customer_secret_key.oci-bucket-user-key.key)
 #   }
 # }
 
@@ -163,8 +163,8 @@ resource "oci_kms_key" "oci-kms-disk-key" {
 # resource "oci_kms_encrypted_data" "oci-kms-bucket-user-key-secret" {
 #   crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
 #   key_id          = oci_kms_key.oci-kms-storage-key.id
-#   # plaintext       = base64encode(oci_identity_customer_secret_key.oci-bucker-user-key.key)
-#   plaintext = oci_vault_secret.oci-bucker-user-key-secret.secret_content.0.content
+#   # plaintext       = base64encode(oci_identity_customer_secret_key.oci-bucket-user-key.key)
+#   plaintext = oci_vault_secret.oci-bucket-user-key-secret.secret_content.0.content
 # }
 
 # resource "oci_kms_encrypted_data" "oci-kms-jwt-monitoring-secret" {
@@ -180,17 +180,17 @@ resource "oci_kms_key" "oci-kms-disk-key" {
 #   plaintext       = base64encode(var.SMTP_PASSWORD)
 # }
 
-# resource "oci_kms_encrypted_data" "oci-kms-ext-s3-key-secret" {
-#   crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
-#   key_id          = oci_kms_key.oci-kms-storage-key.id
-#   plaintext       = base64encode(var.OBJECTSTORE_S3_KEY)
-# }
+resource "oci_kms_encrypted_data" "oci-kms-ext-s3-key-secret" {
+  crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
+  key_id          = oci_kms_key.oci-kms-storage-key.id
+  plaintext       = base64encode(var.OBJECTSTORE_S3_KEY)
+}
 
-# resource "oci_kms_encrypted_data" "oci-kms-ext-s3-secret-secret" {
-#   crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
-#   key_id          = oci_kms_key.oci-kms-storage-key.id
-#   plaintext       = base64encode(var.OBJECTSTORE_S3_SECRET)
-# }
+resource "oci_kms_encrypted_data" "oci-kms-ext-s3-secret-secret" {
+  crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
+  key_id          = oci_kms_key.oci-kms-storage-key.id
+  plaintext       = base64encode(var.OBJECTSTORE_S3_SECRET)
+}
 
 resource "oci_kms_encrypted_data" "kms-zerotier-ntwk-secret" {
   crypto_endpoint = oci_kms_vault.oci-kms-vault.crypto_endpoint
@@ -211,10 +211,10 @@ resource "oci_kms_encrypted_data" "kms-ext-github-secret" {
 }
 
 # # Boot volume in OCI Vault
-# data "oci_core_boot_volumes" "boot_volumes" {
-#   availability_domain = data.oci_identity_availability_domain.oci-availability-domain.name
-#   compartment_id      = oci_identity_compartment.oci-compartment.id
-# }
+data "oci_core_boot_volumes" "boot_volumes" {
+  availability_domain = data.oci_identity_availability_domain.oci-availability-domain.name
+  compartment_id      = oci_identity_compartment.oci-compartment.id
+}
 
 # resource "hcp_vault_secrets_app" "dockerhost-oci" {
 #   app_name    = "${var.prefix}-dockerhost-oci"
@@ -227,14 +227,14 @@ resource "oci_kms_encrypted_data" "kms-ext-github-secret" {
 #   secret_value = length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) > 0 ? (element(data.oci_core_boot_volumes.boot_volumes.boot_volumes, length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) - 1).state == "AVAILABLE" ? element(data.oci_core_boot_volumes.boot_volumes.boot_volumes, length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) - 1).id : data.oci_core_image.oci-image.id) : data.oci_core_image.oci-image.id
 # }
 
-# resource "oci_vault_secret" "boot_volume" {
-#   compartment_id = oci_identity_compartment.oci-compartment.id
-#   vault_id       = oci_kms_vault.oci-kms-vault.id
-#   key_id         = oci_kms_key.oci-kms-storage-key.id
-#   secret_name    = "boot_volume"
-#   description    = "Boot volume ID to keep the volume across deployments"
-#   secret_content {
-#     content_type = "BASE64"
-#     content      = base64encode(length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) > 0 ? (element(data.oci_core_boot_volumes.boot_volumes.boot_volumes, length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) - 1).state == "AVAILABLE" ? element(data.oci_core_boot_volumes.boot_volumes.boot_volumes, length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) - 1).id : data.oci_core_image.oci-image.id) : data.oci_core_image.oci-image.id)
-#   }
-# }
+resource "oci_vault_secret" "boot_volume" {
+  compartment_id = oci_identity_compartment.oci-compartment.id
+  vault_id       = oci_kms_vault.oci-kms-vault.id
+  key_id         = oci_kms_key.oci-kms-storage-key.id
+  secret_name    = "boot_volume"
+  description    = "Boot volume ID to keep the volume across deployments"
+  secret_content {
+    content_type = "BASE64"
+    content      = base64encode(length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) > 0 ? (element(data.oci_core_boot_volumes.boot_volumes.boot_volumes, length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) - 1).state == "AVAILABLE" ? element(data.oci_core_boot_volumes.boot_volumes.boot_volumes, length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) - 1).id : data.oci_core_image.oci-image.id) : data.oci_core_image.oci-image.id)
+  }
+}

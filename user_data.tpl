@@ -46,6 +46,11 @@ zerotier_ntwk_cipher: ${zerotier_ntwk_cipher}
 zerotier_token_cipher: ${zerotier_token_cipher}
 github_cipher: ${github_cipher}
 dns_token: ${dns_token}
+objectstore_s3_key_cipher: ${objectstore_s3_key_cipher}
+objectstore_s3_secret_cipher: ${objectstore_s3_secret_cipher}
+objectstore_s3_region: ${objectstore_s3_region}
+objectstore_s3_hostname: ${objectstore_s3_hostname}
+objectstore_s3_bucketname: ${objectstore_s3_bucketname}
 EOM
 
 

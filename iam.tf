@@ -44,7 +44,7 @@ resource "oci_identity_policy" "oci-id-storageobject-policy" {
 #   user_id  = oci_identity_user.oci-bucket-user.id
 # }
 
-# resource "oci_identity_customer_secret_key" "oci-bucker-user-key" {
+# resource "oci_identity_customer_secret_key" "oci-bucket-user-key" {
 #   display_name = "${var.prefix}-bucket-user-key"
 #   user_id      = oci_identity_user.oci-bucket-user.id
 # }

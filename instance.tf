@@ -29,11 +29,11 @@ resource "oci_core_instance" "oci-instance" {
     ocpus         = var.oci_instance_ocpus
   }
   source_details {
-    source_id   = data.oci_core_image.oci-image.id
-    source_type = "image"
-    # source_id   = var.preserve_boot_volume == false ? data.oci_core_image.oci-image.id : base64decode(oci_vault_secret.boot_volume.secret_content.0.content)
-    # source_type = var.preserve_boot_volume == true ? (startswith(base64decode(oci_vault_secret.boot_volume.secret_content.0.content), "ocid1.bootvolume") ? "bootVolume" : "image") : "image"
-    kms_key_id = oci_kms_key.oci-kms-disk-key.id
+    # source_id   = data.oci_core_image.oci-image.id
+    # source_type = "image"
+    source_id   = var.preserve_boot_volume == false ? data.oci_core_image.oci-image.id : base64decode(oci_vault_secret.boot_volume.secret_content.0.content)
+    source_type = var.preserve_boot_volume == true ? (startswith(base64decode(oci_vault_secret.boot_volume.secret_content.0.content), "ocid1.bootvolume") ? "bootVolume" : "image") : "image"
+    kms_key_id  = oci_kms_key.oci-kms-disk-key.id
     # Applicable when source_type=image
     boot_volume_size_in_gbs = var.oci_instance_diskgb
   }
@@ -42,18 +42,23 @@ resource "oci_core_instance" "oci-instance" {
     user_data = base64encode(templatefile(
       "user_data.tpl",
       {
-        oci_region               = local.oci_region
-        tenancy_ocid             = var.tenancy_ocid
-        docker_network           = var.docker_network
-        docker_gw                = var.docker_gw
-        docker_portainer         = var.docker_portainer
-        docker_watchtower        = var.docker_watchtower
-        docker_cloudflare_tunnel = var.docker_cloudflare_tunnel
-        project_directory        = var.project_directory
-        project_url              = var.project_url
-        oci_kms_endpoint         = oci_kms_vault.oci-kms-vault.crypto_endpoint
-        oci_kms_keyid            = oci_kms_key.oci-kms-storage-key.id
-        dns_token                = data.cloudflare_zero_trust_tunnel_cloudflared_token.tunnel_cloudflared_token.token
+        oci_region                   = local.oci_region
+        tenancy_ocid                 = var.tenancy_ocid
+        docker_network               = var.docker_network
+        docker_gw                    = var.docker_gw
+        docker_portainer             = var.docker_portainer
+        docker_watchtower            = var.docker_watchtower
+        docker_cloudflare_tunnel     = var.docker_cloudflare_tunnel
+        project_directory            = var.project_directory
+        project_url                  = var.project_url
+        oci_kms_endpoint             = oci_kms_vault.oci-kms-vault.crypto_endpoint
+        oci_kms_keyid                = oci_kms_key.oci-kms-storage-key.id
+        dns_token                    = data.cloudflare_zero_trust_tunnel_cloudflared_token.tunnel_cloudflared_token.token
+        objectstore_s3_key_cipher    = oci_kms_encrypted_data.oci-kms-ext-s3-key-secret.ciphertext
+        objectstore_s3_secret_cipher = oci_kms_encrypted_data.oci-kms-ext-s3-secret-secret.ciphertext
+        objectstore_s3_region        = var.OBJECTSTORE_S3_REGION
+        objectstore_s3_hostname      = var.OBJECTSTORE_S3_HOSTNAME
+        objectstore_s3_bucketname    = "${var.prefix}-bkp-bucket-${random_string.oci-random.result}"
         # -------optional----------
         github_cipher         = oci_kms_encrypted_data.kms-ext-github-secret.ciphertext
         zerotier_ntwk_cipher  = oci_kms_encrypted_data.kms-zerotier-ntwk-secret.ciphertext

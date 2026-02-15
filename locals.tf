@@ -54,21 +54,21 @@ locals {
     },
     {
       hostname = "downloader-${var.dns_domain}"
-      service = "http://172.18.1.19:8087"
+      service  = "http://172.18.1.19:8087"
     },
     {
       hostname = "downloader-s3-${var.dns_domain}"
-      service = "http://172.18.1.24:8088"
+      service  = "http://172.18.1.24:8088"
     },
     {
       hostname = "pdf-${var.dns_domain}"
-      service = "http://172.18.1.50:8080"  # (Container IP uses internal port)
+      service  = "http://172.18.1.50:8080" # (Container IP uses internal port)
     }
-      # # ---------public facing apps----------
-      # # immich
-      # {
-      #   hostname = "photos.${join(".", slice(split(".", var.dns_domain), 1, 3))}"
-      #   service  = "http://172.18.1.51:2283"
+    # # ---------public facing apps----------
+    # # immich
+    # {
+    #   hostname = "photos.${join(".", slice(split(".", var.dns_domain), 1, 3))}"
+    #   service  = "http://172.18.1.51:2283"
     # }
   ]
   catchall = [

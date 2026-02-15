@@ -41,7 +41,7 @@
         - ansible_swaptotal_mb < 1
 
     - name: Set swap mount
-      ansible.builtin.mount:
+      ansible.posix.mount:
         src: /"{{ project_directory }}"/swap.file
         path: none
         fstype: swap
@@ -70,26 +70,6 @@
         state: latest
         update_cache: true
 
-    # NEED TO REWRITE THIS
-    # FOLDERS SHOULD ONLY BE CREATED IF NOT AVAILABLE
-    # SHOULD I INSTALL RCLONE LOCALLY TO GENERATE THE CONFIG FILES?
-    # - name: Install Docker Plugin rclone
-    #   ansible.builtin.shell: |
-    #     sudo mkdir -p /var/lib/docker-plugins/rclone/config
-    #     sudo mkdir -p /var/lib/docker-plugins/rclone/cache
-    #     docker plugin install rclone/docker-volume-rclone:amd64 args="-v" --alias rclone --grant-all-permissions
-    #   args:
-    #     executable: /bin/bash
-    #   tags:
-    #     - basicservices
-  
-# ------------
-# NEED TO COMPLETE THE PLUGIN CONFIG AS PER:
-# https://www.selfhosted.club/posts/s3-backed-docker-volumes/
-# HOW TO PASS THE CONFIG? THERE IS LOTS OF SENSITIVE DATA
-# -------------
-
-
     # Install a snap with classic confinement
     # sudo snap install oracle-cloud-agent --classic
     - name: Install "oracle-cloud-agent" with option --classic
@@ -106,7 +86,6 @@
         break_system_packages: true
         state: latest
 
-
     - name: IP Forwarding enable/persist
       ansible.builtin.sysctl:
         name: net.ipv4.ip_forward
@@ -122,29 +101,77 @@
         state: started
         enabled: true
 
-    # - name: Get oci metadata
-    #   ansible.builtin.uri:
-    #     url: http://169.254.169.254/opc/v2/vnics/
-    #     headers:
-    #       Authorization: "Bearer Oracle"
-    #   register: oci_vnic_metadata
+    - name: fetch decrypt External S3 key
+      oci_key_management_decrypted_data:
+        auth_type: "instance_principal"
+        ciphertext: "{{ objectstore_s3_key_cipher }}"
+        service_endpoint: "{{ oci_kms_endpoint }}"
+        key_id: "{{ oci_kms_keyid }}"
+      register: OBJECTSTORE_S3_KEY_decrypt
+      tags:
+        - bucket
 
-    # - name: Get oci private ip facts
-    #   oracle.oci.oci_network_private_ip_facts:
-    #     auth_type: "instance_principal"
-    #     vnic_id: "{{ oci_vnic_metadata.json[0].vnicId }}"
-    #     tenancy: "{{ tenancy_ocid }}"
-    #   register: private_ip_data
+    - name: fetch decrypt External S3 secret
+      oci_key_management_decrypted_data:
+        auth_type: "instance_principal"
+        ciphertext: "{{ objectstore_s3_secret_cipher }}"
+        service_endpoint: "{{ oci_kms_endpoint }}"
+        key_id: "{{ oci_kms_keyid }}"
+      register: OBJECTSTORE_S3_SECRET_decrypt
+      tags:
+        - bucket
+  
+# ------------Docker Rclone Plugin Configuration---------
+    # Adapted from https://rclone.org/docker/
+    # and https://www.selfhosted.club/posts/s3-backed-docker-volumes/
+    - name: Create rclone plugin directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      with_items:
+        - /var/lib/docker-plugins/rclone/config
+        - /var/lib/docker-plugins/rclone/cache
 
-    # - name: Get oci public ip facts
-    #   oracle.oci.oci_network_public_ip_facts:
-    #     auth_type: "instance_principal"
-    #     private_ip_id: "{{ private_ip_data.private_ips[0].id }}"
-    #   register: public_ip_data
+    - name: Create rclone config file
+      ansible.builtin.copy:
+        dest: /var/lib/docker-plugins/rclone/config/rclone.conf
+        content: |
+          [mega]
+          type = s3
+          provider = Other
+          access_key_id = {{ OBJECTSTORE_S3_KEY_decrypt.decrypted_data.plaintext | b64decode  }}
+          secret_access_key = {{ OBJECTSTORE_S3_SECRET_decrypt.decrypted_data.plaintext | b64decode  }}
+          region = {{ objectstore_s3_region }}
+          endpoint = {{ objectstore_s3_hostname }}
+          acl = private
+          bucket_acl = private
 
-    # - name: Set public ip fact for webproxy
-    #   ansible.builtin.set_fact:
-    #     instance_public_ip: "{{ public_ip_data.public_ips[0].ip_address }}"
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Clear rclone cache directory
+      ansible.builtin.file:
+        path: /var/lib/docker-plugins/rclone/cache
+        state: absent
+
+    - name: Install Docker Rclone Plugin
+      community.docker.docker_plugin:
+        name: rclone/docker-volume-rclone:amd64
+        alias: rclone
+        args: "-v"
+        grant_all_permissions: true
+        state: present
+
+    - name: Enable Docker Rclone Plugin
+      community.docker.docker_plugin:
+        name: rclone
+        enabled: true
+        state: present
+# --------------------------------
 
     - name: Various container directories - application
       ansible.builtin.file:
@@ -181,6 +208,48 @@
         service_endpoint: "{{ oci_kms_endpoint }}"
         key_id: "{{ oci_kms_keyid }}"
       register: github_decrypt
+
+# ------BACKUP BUCKET CREATION--------
+    - name: Create S3 bucket (primary storage)
+      # become: true
+      amazon.aws.s3_bucket:
+        state: present
+        aws_access_key: '{{ OBJECTSTORE_S3_KEY_decrypt.decrypted_data.plaintext | b64decode | trim }}'
+        aws_secret_key: '{{ OBJECTSTORE_S3_SECRET_decrypt.decrypted_data.plaintext | b64decode | trim }}'
+        endpoint_url: 'https://{{ objectstore_s3_hostname }}'
+        region: '{{ objectstore_s3_region }}' 
+        name: '{{ objectstore_s3_bucketname }}' 
+        acl: private
+      tags:
+        - bucket
+
+# -------Restore Backup---------
+    - name: Determine Mount folder state via one of its subdirs (zerotier-one)
+      ansible.builtin.stat:
+        path: "{{ project_directory }}/mount/zerotier-one"
+      register: zerotier_state
+
+    - name: Get backup from storage if exists
+      amazon.aws.s3:
+        aws_access_key: '{{ OBJECTSTORE_S3_KEY_decrypt.decrypted_data.plaintext | b64decode | trim }}'
+        aws_secret_key: '{{ OBJECTSTORE_S3_SECRET_decrypt.decrypted_data.plaintext | b64decode | trim }}'
+        endpoint_url: 'https://{{ objectstore_s3_hostname }}'
+        region: '{{ objectstore_s3_region }}' 
+        name: '{{ objectstore_s3_bucketname }}' 
+        object: "mount_backup.tar.gz"
+        dest: "{{ project_directory }}/mount_backup.tar.gz"
+      when: not zerotier_state.stat.exists
+      ignore_errors: true
+
+    - name: Unarchive backup if dir not exists
+      ansible.builtin.unarchive:
+        src: "{{ project_directory }}/mount_backup.tar.gz"
+        dest: "{{ project_directory }}/"
+        remote_src: true
+      when: not zerotier_state.stat.exists
+      ignore_errors: true
+
+# --------------------------------
 
     - name: Determine scripts repo state
       ansible.builtin.stat:
@@ -352,6 +421,109 @@
     - name: Capture end time
       set_fact:
         end_time: "{{ ansible_date_time.iso8601 }}"
+
+# -----Backup---------
+    - name: mount backup playbook (clear)
+      ansible.builtin.file:
+        path: "{{ project_directory }}/mount-backup.yml"
+        state: absent
+
+    - name: mount backup playbook (set)
+      ansible.builtin.lineinfile:
+        path: "{{ project_directory }}/mount-backup.yml"
+        create: true
+        owner: root
+        group: root
+        mode: '0640'
+        line: "{{ item }}"
+      with_items:
+        - "---"
+        - "- name: mount-backup.yml"
+        - "  hosts: localhost"
+        - "  gather_facts: false"
+        - "  collections:"
+        - "    - oracle.oci"
+        - "  tasks:"
+        - "  "
+        - "    - name: Archive mount folder locally"
+        - "      archive:"
+        - "        path: \"{{ project_directory }}/{{ '{{ item }}' }}\""
+        - "        dest: \"{{ project_directory }}/{{ '{{ item }}' }}_backup.tar.gz\""
+        - "        format: gz"
+        - "        owner: root"
+        - "        group: root"
+        - "        mode: '0640'"
+        - "        exclude:"
+        - "          - \"{{ project_directory }}/mount/qBitTorrent/downloads\""
+        - "      with_items:"
+        - "        - mount"
+        - "   "
+        - "    - name: Upload mount archive to storage"
+        - "      amazon.aws.s3:"
+        - "        aws_access_key: \"{{ OBJECTSTORE_S3_KEY_decrypt.decrypted_data.plaintext | b64decode | trim }}\""
+        - "        aws_secret_key: \"{{ OBJECTSTORE_S3_SECRET_decrypt.decrypted_data.plaintext | b64decode | trim }}\""
+        - "        endpoint_url: \"https://{{ objectstore_s3_hostname }}\""
+        - "        region: \"{{ objectstore_s3_region }}\""
+        - "        name: \"{{ objectstore_s3_bucketname }}\""
+        - "        object_name: \"{{ '{{ item }}' }}_backup.tar.gz\""
+        - "        src: \"{{ project_directory }}/{{ '{{ item }}' }}_backup.tar.gz\""
+        - "      with_items: "
+        - "        - mount "
+        - "   "
+
+    - name: Clear service and timer files
+      ansible.builtin.file:
+        path: "/etc/systemd/system/mount-backup.{{ item }}"
+        state: absent
+      with_items:
+        - service
+        - timer
+
+    - name: mount backup systemd timer
+      ansible.builtin.blockinfile:
+        path: /etc/systemd/system/mount-backup.timer
+        create: true
+        owner: root
+        group: root
+        mode: '0644'
+        block: |
+          [Unit]
+          Description=Archives and copies mount_application and mount_database directories to cloud storage
+          [Timer]
+          OnBootSec=60min
+          OnUnitActiveSec=12h
+          Unit=mount-backup.service
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: mount backup systemd service
+      ansible.builtin.blockinfile:
+        path: /etc/systemd/system/mount-backup.service
+        create: true
+        owner: root
+        group: root
+        mode: '0644'
+        block: |
+          [Unit]
+          Description=Archives and copies mount_application and mount_database directories to cloud storage
+          After=network.target
+          [Service]
+          ExecStart=/usr/local/bin/ansible-playbook {{ project_directory }}/mount-backup.yml >> /var/log/mount-backup.log
+          Type=simple
+          Restart=no
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: mount Backup start/enable
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: true
+        daemon_reload: true
+      with_items:
+        - mount-backup.timer
+        - mount-backup.service
+# --------------------------------
 
     - name: Display end time
       debug:
