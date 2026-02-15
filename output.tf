@@ -15,19 +15,19 @@ output "Monitor_installation_progress" {
 # output "Remove_containers_b4_upgrade" {
 #   value = "sudo docker rm -f dockerhost_database dockerhost_nextcloud dockerhost_webproxy dockerhost_onlyoffice dockerhost_redis"
 # }
-output "Re-apply_Ansible_playbook" {
-  value = "sudo systemctl restart dockerhost-ansible-state.service"
-}
+# output "Re-apply_Ansible_playbook" {
+#   value = "sudo systemctl restart dockerhost-ansible-state.service"
+# }
 
-output "destroying" {
-  value = <<OUTPUT
-If destroying a project, delete all bucket objects before running terraform destroy.
-WARNING: THESE BUCKETS HOLD NEXTCLOUD+DB BACKUPS.
- e.g:
-"oci os object bulk-delete-versions -bn ${oci_objectstorage_bucket.oci-bucket.name} -ns ${data.oci_objectstorage_namespace.oci-bucket-namespace.namespace}"
-"oci os object bulk-delete-versions -bn ${oci_objectstorage_bucket.oci-bucket.name}-data -ns ${data.oci_objectstorage_namespace.oci-bucket-namespace.namespace}"
-# Delete the files in the bucket, and then delete the bucket
-"aws --endpoint-url=https://${var.OBJECTSTORE_S3_HOSTNAME} --profile <PROFILE_NAME> S3 rm s3://${var.prefix}-oci-data-${random_string.oci-random.result}/ --recursive --include '*'" 
-"aws --endpoint-url=https://${var.OBJECTSTORE_S3_HOSTNAME} --profile <PROFILE_NAME> s3api delete-bucket --bucket ${var.prefix}-oci-data-${random_string.oci-random.result}"
-OUTPUT
-}
+# output "destroying" {
+#   value = <<OUTPUT
+# If destroying a project, delete all bucket objects before running terraform destroy.
+# WARNING: THESE BUCKETS HOLD NEXTCLOUD+DB BACKUPS.
+#  e.g:
+# "oci os object bulk-delete-versions -bn ${oci_objectstorage_bucket.oci-bucket.name} -ns ${data.oci_objectstorage_namespace.oci-bucket-namespace.namespace}"
+# "oci os object bulk-delete-versions -bn ${oci_objectstorage_bucket.oci-bucket.name}-data -ns ${data.oci_objectstorage_namespace.oci-bucket-namespace.namespace}"
+# # Delete the files in the bucket, and then delete the bucket
+# "aws --endpoint-url=https://${var.OBJECTSTORE_S3_HOSTNAME} --profile <PROFILE_NAME> S3 rm s3://${var.prefix}-oci-data-${random_string.oci-random.result}/ --recursive --include '*'" 
+# "aws --endpoint-url=https://${var.OBJECTSTORE_S3_HOSTNAME} --profile <PROFILE_NAME> s3api delete-bucket --bucket ${var.prefix}-oci-data-${random_string.oci-random.result}"
+# OUTPUT
+# }

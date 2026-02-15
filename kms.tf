@@ -211,10 +211,10 @@ resource "oci_kms_encrypted_data" "kms-ext-github-secret" {
 }
 
 # # Boot volume in OCI Vault
-# data "oci_core_boot_volumes" "boot_volumes" {
-#   availability_domain = data.oci_identity_availability_domain.oci-availability-domain.name
-#   compartment_id      = oci_identity_compartment.oci-compartment.id
-# }
+data "oci_core_boot_volumes" "boot_volumes" {
+  availability_domain = data.oci_identity_availability_domain.oci-availability-domain.name
+  compartment_id      = oci_identity_compartment.oci-compartment.id
+}
 
 # resource "hcp_vault_secrets_app" "dockerhost-oci" {
 #   app_name    = "${var.prefix}-dockerhost-oci"
@@ -227,14 +227,14 @@ resource "oci_kms_encrypted_data" "kms-ext-github-secret" {
 #   secret_value = length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) > 0 ? (element(data.oci_core_boot_volumes.boot_volumes.boot_volumes, length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) - 1).state == "AVAILABLE" ? element(data.oci_core_boot_volumes.boot_volumes.boot_volumes, length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) - 1).id : data.oci_core_image.oci-image.id) : data.oci_core_image.oci-image.id
 # }
 
-# resource "oci_vault_secret" "boot_volume" {
-#   compartment_id = oci_identity_compartment.oci-compartment.id
-#   vault_id       = oci_kms_vault.oci-kms-vault.id
-#   key_id         = oci_kms_key.oci-kms-storage-key.id
-#   secret_name    = "boot_volume"
-#   description    = "Boot volume ID to keep the volume across deployments"
-#   secret_content {
-#     content_type = "BASE64"
-#     content      = base64encode(length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) > 0 ? (element(data.oci_core_boot_volumes.boot_volumes.boot_volumes, length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) - 1).state == "AVAILABLE" ? element(data.oci_core_boot_volumes.boot_volumes.boot_volumes, length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) - 1).id : data.oci_core_image.oci-image.id) : data.oci_core_image.oci-image.id)
-#   }
-# }
+resource "oci_vault_secret" "boot_volume" {
+  compartment_id = oci_identity_compartment.oci-compartment.id
+  vault_id       = oci_kms_vault.oci-kms-vault.id
+  key_id         = oci_kms_key.oci-kms-storage-key.id
+  secret_name    = "boot_volume"
+  description    = "Boot volume ID to keep the volume across deployments"
+  secret_content {
+    content_type = "BASE64"
+    content      = base64encode(length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) > 0 ? (element(data.oci_core_boot_volumes.boot_volumes.boot_volumes, length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) - 1).state == "AVAILABLE" ? element(data.oci_core_boot_volumes.boot_volumes.boot_volumes, length(data.oci_core_boot_volumes.boot_volumes.boot_volumes) - 1).id : data.oci_core_image.oci-image.id) : data.oci_core_image.oci-image.id)
+  }
+}

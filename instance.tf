@@ -29,11 +29,11 @@ resource "oci_core_instance" "oci-instance" {
     ocpus         = var.oci_instance_ocpus
   }
   source_details {
-    source_id   = data.oci_core_image.oci-image.id
-    source_type = "image"
-    # source_id   = var.preserve_boot_volume == false ? data.oci_core_image.oci-image.id : base64decode(oci_vault_secret.boot_volume.secret_content.0.content)
-    # source_type = var.preserve_boot_volume == true ? (startswith(base64decode(oci_vault_secret.boot_volume.secret_content.0.content), "ocid1.bootvolume") ? "bootVolume" : "image") : "image"
-    kms_key_id = oci_kms_key.oci-kms-disk-key.id
+    # source_id   = data.oci_core_image.oci-image.id
+    # source_type = "image"
+    source_id   = var.preserve_boot_volume == false ? data.oci_core_image.oci-image.id : base64decode(oci_vault_secret.boot_volume.secret_content.0.content)
+    source_type = var.preserve_boot_volume == true ? (startswith(base64decode(oci_vault_secret.boot_volume.secret_content.0.content), "ocid1.bootvolume") ? "bootVolume" : "image") : "image"
+    kms_key_id  = oci_kms_key.oci-kms-disk-key.id
     # Applicable when source_type=image
     boot_volume_size_in_gbs = var.oci_instance_diskgb
   }
@@ -54,8 +54,6 @@ resource "oci_core_instance" "oci-instance" {
         oci_kms_endpoint             = oci_kms_vault.oci-kms-vault.crypto_endpoint
         oci_kms_keyid                = oci_kms_key.oci-kms-storage-key.id
         dns_token                    = data.cloudflare_zero_trust_tunnel_cloudflared_token.tunnel_cloudflared_token.token
-        bucket_user_key_cipher       = oci_kms_encrypted_data.oci-kms-bucket-user-key-secret.ciphertext
-        bucket_user_id               = oci_identity_customer_secret_key.oci-bucket-user-key.id
         objectstore_s3_key_cipher    = oci_kms_encrypted_data.oci-kms-ext-s3-key-secret.ciphertext
         objectstore_s3_secret_cipher = oci_kms_encrypted_data.oci-kms-ext-s3-secret-secret.ciphertext
         objectstore_s3_region        = var.OBJECTSTORE_S3_REGION

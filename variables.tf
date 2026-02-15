@@ -55,7 +55,7 @@ variable "oci_instance_shape" {
 variable "oci_instance_diskgb" {
   type        = string
   description = "Size of system boot disk, in gb"
-  default     = 100
+  default     = 200
 }
 
 variable "oci_instance_memgb" {
@@ -303,7 +303,7 @@ variable "cloudflare_token" {
 variable "preserve_boot_volume" {
   type        = bool
   description = "Preserve boot volume between deployments. false(DEV)/true(PROD)"
-  default     = false
+  default     = true
 }
 
 # # backups: 5 are within the OCI always free tier:
