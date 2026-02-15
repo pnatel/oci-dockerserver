@@ -168,7 +168,7 @@
 
     - name: Enable Docker Rclone Plugin
       community.docker.docker_plugin:
-        name: rclone
+        name: rclone/docker-volume-rclone:latest
         enabled: true
         state: present
 # --------------------------------
