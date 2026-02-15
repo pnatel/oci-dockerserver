@@ -162,14 +162,9 @@
       community.docker.docker_plugin:
         plugin_name: rclone/docker-volume-rclone:latest
         alias: rclone
-        state: present
+        state: enable
         plugin_options:
           args: "-v"
-
-    - name: Enable Docker Rclone Plugin
-      community.docker.docker_plugin:
-        plugin_name: rclone/docker-volume-rclone:latest
-        state: enable
 
 # --------------------------------
 
