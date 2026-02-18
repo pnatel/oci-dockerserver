@@ -52,10 +52,10 @@ locals {
       hostname = "ebooks-requests-${var.dns_domain}"
       service  = "http://172.18.1.34:8084"
     },
-    {
-      hostname = "downloader-${var.dns_domain}"
-      service  = "http://172.18.1.19:8087"
-    },
+    # {
+    #   hostname = "downloader-${var.dns_domain}"
+    #   service = "http://172.18.1.19:8087"
+    # },
     {
       hostname = "downloader-s3-${var.dns_domain}"
       service  = "http://172.18.1.24:8088"
